@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+
+{% block title %}Remote Connectivity Check{% endblock %}
+
+{% block content %}
+<div class="header-section">
+  <h1>Remote Connectivity Check</h1>
+  <p>Test your network endpoints using Ping, Telnet, or Traceroute</p>
+</div>
+
+<div class="remote-check-section">
+  <!-- Input Area -->
+  <div class="remote-input-card">
+    <div class="input-group">
+      <input type="text" id="single-target" placeholder="Enter IP address or hostname">
+      <input type="text" id="single-port" placeholder="Port (for Telnet)" min="1" max="65535">
+      <button class="btn btn-purple" id="btn-ping"><span class="material-symbols-rounded">signal_cellular_alt</span> Ping</button>
+      <button class="btn btn-yellow" id="btn-telnet"><span class="material-symbols-rounded">power</span> Telnet</button>
+      <button class="btn btn-blue" id="btn-traceroute"><span class="material-symbols-rounded">route</span> Traceroute</button>
+    </div>
+  </div>
+
+  <!-- Results Grid (Columns) -->
+  <div class="results-grid">
+    <!-- Ping -->
+    <div class="results-card">
+      <div class="card-header">
+        <div class="card-icon"><span class="material-symbols-rounded">show_chart</span></div>
+        <h3>Ping</h3>
+      </div>
+      <div class="card-content">
+        <div class="stats">
+          <div><b>Target:</b> <span id="ping-target-display">-</span></div>
+          <div><b>Status:</b> <span id="ping-status">-</span></div>
+        </div>
+        <div class="output-box" id="ping-output">
+          <div class="output-placeholder">
+            <span class="material-symbols-rounded">info</span>
+            <p>Enter a target and click Ping</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Telnet -->
+    <div class="results-card">
+      <div class="card-header">
+        <div class="card-icon"><span class="material-symbols-rounded">terminal</span></div>
+        <h3>Telnet</h3>
+      </div>
+      <div class="card-content">
+        <div class="stats">
+          <div><b>Target:</b> <span id="telnet-target-display">-</span></div>
+          <div><b>Port:</b> <span id="telnet-port-display">-</span></div>
+          <div><b>Status:</b> <span id="telnet-status">-</span></div>
+        </div>
+        <div class="output-box" id="telnet-output">
+          <div class="output-placeholder">
+            <span class="material-symbols-rounded">info</span>
+            <p>Enter a target& port, then click Telnet</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Traceroute -->
+    <div class="results-card">
+      <div class="card-header">
+        <div class="card-icon"><span class="material-symbols-rounded">route</span></div>
+        <h3>Traceroute</h3>
+      </div>
+      <div class="card-content">
+        <div class="stats">
+          <div><b>Target:</b> <span id="traceroute-target-display">-</span></div>
+          <div><b>Status:</b> <span id="traceroute-status">-</span></div>
+        </div>
+        <div class="output-box" id="traceroute-output">
+          <div class="output-placeholder">
+            <span class="material-symbols-rounded">info</span>
+        <pre class="output-box" id="traceroute-output">Enter a target and click Traceroute</pre>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+
+
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+
+    async function remoteCheck(type) {
+        const target = document.getElementById("single-target").value.trim();
+        const port = document.getElementById("single-port").value || 80;
+        if(!target) return alert("Enter target");
+
+        // Show target immediately
+        if(type==="ping") document.getElementById("ping-target-display").innerText = target;
+        if(type==="telnet") document.getElementById("telnet-target-display").innerText = target;
+        if(type==="traceroute") document.getElementById("traceroute-target-display").innerText = target;
+
+        // Show loading
+        if(type==="ping") { 
+            document.getElementById("ping-status").innerText="Checking...";
+            document.getElementById("ping-output").innerText="";
+        }
+        if(type==="telnet") {
+            document.getElementById("telnet-status").innerText="Checking...";
+            document.getElementById("telnet-output").innerText="";
+        }
+        if(type==="traceroute") {
+            document.getElementById("traceroute-status").innerText="Checking...";
+            document.getElementById("traceroute-output").innerText="...";
+        }
+
+        try {
+            const res = await fetch("/api/remote_check", {
+                method:"POST",
+                headers:{"Content-Type":"application/json"},
+                body: JSON.stringify({target,type,port})
+            });
+            const data = await res.json();
+
+            if(type==="ping") {
+                document.getElementById("ping-status").innerText = data.status;
+                document.getElementById("ping-output").innerText = data.message;
+            }
+            if(type==="telnet") {
+                document.getElementById("telnet-status").innerText = data.status;
+                document.getElementById("telnet-output").innerText = data.message;
+            }
+            if(type==="traceroute") {
+                document.getElementById("traceroute-status").innerText = data.status;
+                document.getElementById("traceroute-output").innerText = data.message;
+            }
+
+        } catch(err) {
+            console.error(err);
+            if(type==="ping") document.getElementById("ping-output").innerText = "Error: "+err;
+            if(type==="telnet") document.getElementById("telnet-output").innerText = "Error: "+err;
+            if(type==="traceroute") document.getElementById("traceroute-output").innerText = "Error: "+err;
+        }
+    }
+
+    document.getElementById("btn-ping").addEventListener("click", ()=>remoteCheck("ping"));
+    document.getElementById("btn-telnet").addEventListener("click", ()=>remoteCheck("telnet"));
+    document.getElementById("btn-traceroute").addEventListener("click", ()=>remoteCheck("traceroute"));
+});
+</script>
+{% endblock %}

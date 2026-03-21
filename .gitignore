@@ -1,0 +1,22 @@
+# Byte-code files
+__pycache__/
+*.pyc
+
+# Virtual environment
+.venv/
+venv/
+env/
+
+# IDE/Editor files
+.vscode/
+.idea/
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+
+# Logs and other files
+*.log
+.env
+dist/servermanagemnt.tar

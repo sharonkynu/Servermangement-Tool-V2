@@ -1,0 +1,12 @@
+services:
+  sip_service:
+    environment:
+    - SIP_PORT=4441
+    - H323_PORT=8111
+    - H323_ENABLED=true
+    - SIP_ENABLED=true
+    - PRIVATE_IP=192.168.1.1110
+    - PUBLIC_IP=203.0.113.2222
+    - LICENCE_KEY_MANAGEMENT=12345678
+    image: redis:latest
+version: '3'

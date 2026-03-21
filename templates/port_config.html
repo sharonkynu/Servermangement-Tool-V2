@@ -1,0 +1,227 @@
+{% extends "base.html" %}
+{% block title %}Port Configuration - Server Management{% endblock %}
+
+{% block content %}
+<style>
+/* --- Layout --- */
+.page-header { text-align:center; margin-bottom:25px; }
+.ports-grid { display:flex; flex-direction:column; align-items:center; gap:25px; }
+.config-card { background:var(--bg-card); border-radius:16px; box-shadow:0 6px 20px rgba(0,0,0,0.08); width:90%; max-width:800px; padding:25px; animation:fadeInUp 0.5s ease-out; }
+.card-header { display:flex; align-items:center; gap:10px; margin-bottom:20px; }
+.card-header h3 { font-size:1.4rem; margin:0; color: var(--text-main); }
+.card-icon i { background:var(--primary-btn); color:white; padding:10px; border-radius:10px; }
+
+/* --- Toggle Switch --- */
+.switch { position:relative; display:inline-block; width:55px; height:28px; }
+.switch input { display:none; }
+.slider { position:absolute; cursor:pointer; background-color:var(--border-color); border-radius:34px; top:0; left:0; right:0; bottom:0; transition:.4s; }
+.slider:before { position:absolute; content:""; height:20px; width:20px; left:4px; bottom:4px; background:white; transition:.4s; border-radius:50%; }
+input:checked + .slider { background-color:var(--primary-btn); }
+input:checked + .slider:before { transform:translateX(26px); }
+
+/* --- Port Table --- */
+.ports-table { background:var(--bg-main); border-radius:8px; padding:15px; max-height: 500px; overflow-y: auto; }
+.port-row { display:flex; align-items:center; justify-content:space-between; background:var(--bg-card); border:1px solid var(--border-color); border-radius:6px; padding:12px; margin-bottom:8px; transition:all 0.3s ease; }
+.port-row:hover { box-shadow:0 2px 8px rgba(0,0,0,0.1); }
+.port-info { display:flex; align-items:center; gap:12px; flex:1; }
+.port-name { font-weight:600; color:var(--text-main); }
+.port-number { background:rgba(0, 123, 255, 0.1); color:var(--primary-btn); padding:4px 8px; border-radius:50px; font-size:0.9em; font-weight:600; min-width: 45px; text-align: center; }
+.port-status { display:flex; align-items:center; gap:8px; }
+.port-status-indicator { width:10px; height:10px; border-radius:50%; background:var(--danger); }
+.port-status-indicator.enabled { background:#28a745; }
+
+/* --- Buttons --- */
+.btn { padding:10px 18px; border:none; border-radius:8px; cursor:pointer; font-weight:600; display:flex; align-items:center; gap:6px; transition:background 0.3s ease; }
+.btn-primary { background:var(--primary-btn); color:white; } .btn-primary:hover { background:var(--primary-btn-hover); }
+.btn-info { background:#17a2b8; color:white; } .btn-info:hover { background:#117a8b; }
+
+/* --- Notifications --- */
+.notification { position:fixed; top:20px; right:-400px; background:var(--bg-card); color:var(--text-main); padding:12px 20px; border-radius:8px; opacity:0; z-index:1000; display:flex; align-items:center; gap:8px; transition: all 0.5s ease; border: 1px solid var(--border-color); }
+.notification.show { right:20px; opacity:1; }
+.notification-success { background:#28a745; color: white; }
+.notification-error { background:var(--danger); color: white; }
+
+/* --- Scanner --- */
+.scan-output { background:#111; color:#0f0; font-family:monospace; border-radius:8px; padding:12px; height:300px; overflow-y:auto; font-size:0.9em; }
+.scan-summary { background:var(--primary-btn); color:white; padding:4px 8px; border-radius:4px; font-size:0.9em; font-weight:600; }
+@keyframes fadeInUp { from { transform:translateY(15px); opacity:0; } to { transform:translateY(0); opacity:1; } }
+</style>
+
+<div class="page-header">
+  <h1>Port Configuration</h1>
+  <p>Manage SSH, HTTP, and HTTPS port access with real-time status and scanning.</p>
+</div>
+
+<div class="ports-grid">
+
+  <!-- Port Scanner -->
+  <div class="config-card">
+    <div class="card-header">
+      <div class="card-icon"><span class="material-symbols-rounded">search</span></div>
+      <h3>Port Scanner</h3>
+    </div>
+    <div class="protocol-section">
+      <div class="protocol-header" style="display:flex;justify-content:space-between;align-items:center;">
+        <div><h4>Scan Open Ports</h4><p>Discover open ports</p></div>
+        <button type="button" class="btn btn-info" id="scan-ports-btn">
+          <span class="material-symbols-rounded">search</span> Scan Ports
+        </button>
+      </div>
+      <div id="scan-results" style="display:none;margin-top:15px;">
+        <div class="scan-header" style="display:flex;justify-content:space-between;align-items:center;">
+          <h5>Scan Results</h5>
+          <span id="scan-summary" class="scan-summary"></span>
+        </div>
+        <div class="scan-output" id="scan-content">Click "Scan Ports" to start scanning...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Port Management -->
+  <div class="config-card">
+    <div class="card-header">
+      <div class="card-icon"><span class="material-symbols-rounded">settings_suggest</span></div>
+      <h3>Port Management</h3>
+    </div>
+
+    <div class="ports-table" id="ports-table">
+      <div class="loading-ports"><span class="material-symbols-rounded fa-spin">progress_activity</span> Loading port statuses...</div>
+    </div>
+
+    <div class="form-actions" style="text-align:center;margin-top:20px;">
+      <button type="button" class="btn btn-primary" id="apply-port-changes">
+        <span class="material-symbols-rounded">save</span> Apply Changes
+      </button>
+    </div>
+    <div id="port-apply-status" style="margin-top:12px;text-align:center;font-weight:500;"></div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const portsTable = document.getElementById("ports-table");
+  const applyPortChangesBtn = document.getElementById("apply-port-changes");
+  const scanPortsBtn = document.getElementById("scan-ports-btn");
+  const scanResults = document.getElementById("scan-results");
+  const scanContent = document.getElementById("scan-content");
+  const scanSummary = document.getElementById("scan-summary");
+  const portApplyStatus = document.getElementById("port-apply-status");
+
+  let portsData = [
+    { id: 'ssh', name: 'SSH', port: 22, enabled: true },
+    { id: 'http', name: 'HTTP', port: 80, enabled: true },
+    { id: 'https', name: 'HTTPS', port: 443, enabled: true }
+  ];
+
+  function showNotification(msg, type) {
+    const n = document.createElement('div');
+    n.className = `notification notification-${type}`;
+    n.innerHTML = `<span class="material-symbols-rounded">star</span> ${msg}`;
+    document.body.appendChild(n);
+    setTimeout(()=>n.classList.add('show'),100);
+    setTimeout(()=>{ n.classList.remove('show'); setTimeout(()=>document.body.removeChild(n),300); },3000);
+  }
+
+  function loadPorts() {
+    fetch('/api/check_port_status')
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === 'success' && data.ports) {
+          // Use the complete list from API (defaults + extra open ports)
+          portsData = data.ports;
+        } else {
+          console.warn("API returned non-success status for check_port_status");
+        }
+        renderPortsTable();
+      })
+      .catch((err) => {
+        console.error("Failed to fetch port status:", err);
+        renderPortsTable();
+      });
+  }
+
+  function renderPortsTable() {
+    const html = portsData.map(port => `
+      <div class="port-row">
+        <div class="port-info">
+          <div class="port-status-indicator ${port.enabled ? 'enabled' : ''}"></div>
+          <div class="port-name">${port.name}</div>
+          <div class="port-number">${port.port}</div>
+        </div>
+        <div class="port-status">
+          <span style="font-size:0.9em;color:#666;">${port.enabled ? 'Enabled' : 'Disabled'}</span>
+          <label class="switch">
+            <input type="checkbox" class="port-toggle" data-port="${port.port}" ${port.enabled ? 'checked' : ''}>
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+    `).join('');
+    portsTable.innerHTML = html;
+
+    portsTable.querySelectorAll('.port-toggle').forEach(toggle => {
+      toggle.addEventListener('change', e => {
+        const port = portsData.find(p => p.port == e.target.dataset.port);
+        if (port) port.enabled = e.target.checked;
+      });
+    });
+  }
+
+  function applyPortChanges() {
+    applyPortChangesBtn.disabled = true;
+    applyPortChangesBtn.innerHTML = '<span class="material-symbols-rounded fa-spin">progress_activity</span> Applying...';
+    fetch('/api/system_ports', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ports: portsData })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.status === 'success') {
+        showNotification('Port configuration updated successfully', 'success');
+        portApplyStatus.textContent = `Last updated at ${new Date().toLocaleTimeString()}`;
+      } else {
+        showNotification('Failed to update ports', 'error');
+      }
+    })
+    .catch(() => showNotification('Network error', 'error'))
+    .finally(() => {
+      applyPortChangesBtn.disabled = false;
+      applyPortChangesBtn.innerHTML = '<span class="material-symbols-rounded">save</span> Apply Changes';
+    });
+  }
+
+  function scanPorts() {
+    scanResults.style.display = 'block';
+    scanContent.innerHTML = '<span class="material-symbols-rounded fa-spin">progress_activity</span> Scanning...';
+    scanPortsBtn.disabled = true;
+    scanPortsBtn.innerHTML = '<span class="material-symbols-rounded fa-spin">progress_activity</span> Scanning...';
+    fetch('/api/scan_ports')
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === 'success' && data.scan_results) {
+          scanSummary.textContent = `${data.total_ports || data.scan_results.length} ports found`;
+          let output = `PORT     STATE SERVICE\n----     ----- -------\n`;
+          data.scan_results.forEach(p => {
+            output += `${p.port.toString().padEnd(8)} ${p.state.padEnd(8)} ${p.service || 'unknown'}\n`;
+          });
+          scanContent.innerHTML = `<pre>${output}</pre>`;
+        } else {
+          scanContent.textContent = 'No open ports found or scan failed.';
+        }
+      })
+      .catch(() => scanContent.textContent = 'Error during scan.')
+      .finally(() => {
+        scanPortsBtn.disabled = false;
+        scanPortsBtn.innerHTML = '<span class="material-symbols-rounded">search</span> Scan Ports';
+      });
+  }
+
+  scanPortsBtn.addEventListener('click', scanPorts);
+  applyPortChangesBtn.addEventListener('click', applyPortChanges);
+  loadPorts();
+});
+</script>
+{% endblock %}

@@ -1,0 +1,272 @@
+{% extends "base.html" %}
+{% block title %}H323/SIP Ports & Protocols - Server Management{% endblock %}
+
+{% block content %}
+<style>
+/* --- Layout --- */
+.page-header { text-align:center; margin-bottom:25px; }
+.ports-grid { display:flex; flex-direction:column; align-items:center; gap:25px; }
+.config-card { background:var(--bg-card); border-radius:16px; box-shadow:0 6px 20px rgba(0,0,0,0.08); width:90%; max-width:800px; padding:25px; animation:fadeInUp 0.5s ease-out; }
+.card-header { display:flex; align-items:center; gap:10px; margin-bottom:20px; }
+.card-header h3 { font-size:1.4rem; margin:0; color: var(--text-main); }
+.card-icon i { background:var(--primary-btn); color:white; padding:10px; border-radius:10px; }
+
+/* --- Protocols --- */
+.protocol-section { border:1px solid var(--border-color); border-radius:12px; padding:15px; margin-bottom:15px; background:var(--bg-main); transition:all 0.3s ease; }
+.protocol-header { display:flex; justify-content:space-between; align-items:center; }
+.protocol-info { display:flex; align-items:center; gap:10px; }
+.protocol-details h4 { margin:0; font-weight:600; color:var(--text-main); }
+.protocol-details p { margin:0; font-size:0.9em; color:var(--text-muted); }
+
+/* --- Toggle Switch --- */
+.switch { position:relative; display:inline-block; width:55px; height:28px; }
+.switch input { display:none; }
+.slider { position:absolute; cursor:pointer; background-color:var(--border-color); border-radius:34px; top:0; left:0; right:0; bottom:0; transition:.4s; }
+.slider:before { position:absolute; content:""; height:20px; width:20px; left:4px; bottom:4px; background:white; transition:.4s; border-radius:50%; }
+input:checked + .slider { background-color:var(--primary-btn); }
+input:checked + .slider:before { transform:translateX(26px); }
+
+/* --- Form --- */
+.config-grid { display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-top:15px; }
+.form-group label { display:block; font-weight:500; margin-bottom:5px; color:var(--text-main); }
+input[type="number"], input[type="text"] { width:100%; padding:8px 10px; border-radius:6px; border:1px solid var(--border-color); background:var(--input-bg); color:var(--input-text); transition:border 0.3s ease; }
+input:focus { border-color:var(--primary-btn); outline:none; }
+
+/* --- Buttons --- */
+.form-actions { text-align:center; margin-top:25px; display:flex; justify-content:center; gap:15px; }
+.btn { padding:10px 18px; border:none; border-radius:8px; cursor:pointer; font-weight:600; display:flex; align-items:center; gap:6px; transition:background 0.3s ease; }
+.btn-primary { background:var(--primary-btn); color:white; } .btn-primary:hover { background:var(--primary-btn-hover); }
+.btn-secondary { background:#6c757d; color:white; } .btn-secondary:hover { background:#565e64; }
+
+/* --- Notifications --- */
+.notification { position:fixed; top:20px; right:-400px; background:var(--bg-card); color:var(--text-main); padding:12px 20px; border-radius:8px; opacity:0; z-index:1000; display:flex; align-items:center; gap:8px; transition: all 0.5s ease; border: 1px solid var(--border-color); }
+.notification.show { right:20px; opacity:1; }
+.notification-success { background:#28a745; color: white; }
+.notification-error { background:var(--danger); color: white; }
+
+/* --- Animations --- */
+@keyframes fadeInUp { from { transform:translateY(15px); opacity:0; } to { transform:translateY(0); opacity:1; } }
+</style>
+
+<div class="page-header">
+    <h1>H323/SIP Ports & Protocols Configuration</h1>
+    <p>Toggle SIP and H.323 settings, set private/public IPs, and apply instantly.</p>
+</div>
+
+<div class="ports-grid">
+    <div class="config-card">
+        <div class="card-header">
+            <div class="card-icon"><span class="material-symbols-rounded">power</span></div>
+            <h3>Protocol Configuration</h3>
+        </div>
+        <form id="protocols-form">
+            <!-- H323 Section -->
+            <div class="protocol-section">
+                <div class="protocol-header">
+                    <div class="protocol-info">
+                        <span class="material-symbols-rounded">videocam</span>
+                        <div class="protocol-details">
+                            <h4>H.323 Protocol</h4>
+                            <p>Video conferencing and VoIP protocol</p>
+                        </div>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="h323-enabled" name="h323_enabled">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="protocol-config" id="h323-config" style="display:none;">
+                    <div class="config-grid">
+                        <div class="form-group">
+                            <label>Port</label>
+                            <input type="number" id="h323-port" name="h323_port" value="1720">
+                        </div>
+                        <div class="form-group">
+                            <label>Port Range</label>
+                            <input type="text" id="h323-ports-range" name="h323_ports_range" value="1024-65535">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SIP Section -->
+            <div class="protocol-section">
+                <div class="protocol-header">
+                    <div class="protocol-info">
+                        <span class="material-symbols-rounded">call</span>
+                        <div class="protocol-details">
+                            <h4>SIP Protocol</h4>
+                            <p>Session Initiation Protocol for VoIP</p>
+                        </div>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="sip-enabled" name="sip_enabled">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="protocol-config" id="sip-config" style="display:none;">
+                    <div class="config-grid">
+                        <div class="form-group">
+                            <label>Port</label>
+                            <input type="number" id="sip-port" name="sip_port" value="5060">
+                        </div>
+                        <div class="form-group">
+                            <label>TLS Port</label>
+                            <input type="number" id="sip-tls-port" name="sip_tls_port" value="5061">
+                        </div>
+                        <div class="form-group">
+                            <label>Domain</label>
+                            <input type="text" id="sip-domain" name="sip_domain" placeholder="example.com">
+                        </div>
+                        <div class="form-group">
+                            <label>Registrar</label>
+                            <input type="text" id="sip-registrar" name="sip_registrar" placeholder="sip.example.com">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- IP Configuration -->
+            <div class="protocol-section">
+                <div class="protocol-header">
+                    <div class="protocol-info">
+                        <span class="material-symbols-rounded">lan</span>
+                        <div class="protocol-details">
+                            <h4>Network IP Configuration</h4>
+                            <p>Set private and public IPs for signaling</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="protocol-config" id="ip-config">
+                    <div class="config-grid">
+                        <div class="form-group">
+                            <label>Private IP</label>
+                            <input type="text" id="private-ip" name="private_ip" placeholder="192.168.x.x">
+                        </div>
+                        <div class="form-group">
+                            <label>Public IP</label>
+                            <input type="text" id="public-ip" name="public_ip" placeholder="203.x.x.x">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary"><span class="material-symbols-rounded">save</span> Apply</button>
+                <button type="button" class="btn btn-secondary" id="reset-protocols"><span class="material-symbols-rounded">undo</span> Reset</button>
+            </div>
+
+            <div id="apply-status" style="margin-top:12px; font-weight:500;"></div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("protocols-form");
+  const h323Toggle = document.getElementById("h323-enabled");
+  const sipToggle = document.getElementById("sip-enabled");
+  const h323Config = document.getElementById("h323-config");
+  const sipConfig = document.getElementById("sip-config");
+  const applyStatus = document.getElementById("apply-status");
+
+  function showNotification(msg, type) {
+    const n = document.createElement('div');
+    n.className = `notification notification-${type}`;
+    n.innerHTML = `<span class="material-symbols-rounded">star</span> ${msg}`;
+    document.body.appendChild(n);
+    setTimeout(()=>n.classList.add('show'),100);
+    setTimeout(()=>{ n.classList.remove('show'); setTimeout(()=>document.body.removeChild(n),300); },3000);
+  }
+
+  function updateConfigUI(state){
+    h323Toggle.checked = state.h323_enabled;
+    sipToggle.checked = state.sip_enabled;
+    document.getElementById('h323-port').value = state.h323_port;
+    document.getElementById('sip-port').value = state.sip_port;
+    document.getElementById('private-ip').value = state.private_ip || '';
+    document.getElementById('public-ip').value = state.public_ip || '';
+    h323Config.style.display = state.h323_enabled ? 'block' : 'none';
+    sipConfig.style.display = state.sip_enabled ? 'block' : 'none';
+  }
+
+  // Load current state
+  fetch('/api/ports_config_state')
+    .then(res=>res.json())
+    .then(data=>{ if(data.status==='success') updateConfigUI(data.current_state); });
+
+  // Mutual exclusion toggle
+  //h323Toggle.addEventListener('change',()=>{ if(h323Toggle.checked){ sipToggle.checked=false; sipConfig.style.display='none'; h323Config.style.display='block'; } else h323Config.style.display='none'; });
+  //sipToggle.addEventListener('change',()=>{ if(sipToggle.checked){ h323Toggle.checked=false; h323Config.style.display='none'; sipConfig.style.display='block'; } else sipConfig.style.display='none'; });
+
+  // Updated toggle behavior — allow both ON
+    h323Toggle.addEventListener('change', () => {
+    if (h323Toggle.checked) {
+        h323Config.style.display = 'block';
+    } else {
+        h323Config.style.display = 'none';
+    }
+    });
+
+    sipToggle.addEventListener('change', () => {
+    if (sipToggle.checked) {
+        sipConfig.style.display = 'block';
+    } else {
+        sipConfig.style.display = 'none';
+    }
+    });
+  
+
+  // Submit form
+  form.addEventListener('submit', e=>{
+    e.preventDefault();
+    /*
+    const config={
+      h323_enabled:h323Toggle.checked,
+      sip_enabled:sipToggle.checked,
+      h323_port:document.getElementById('h323-port').value,
+      sip_port:document.getElementById('sip-port').value,
+      private_ip:document.getElementById('private-ip').value,
+      public_ip:document.getElementById('public-ip').value
+    }; */
+    const config = {
+      h323_enabled: !!h323Toggle.checked,
+      sip_enabled: !!sipToggle.checked,
+      h323_port: parseInt(document.getElementById('h323-port').value, 10),
+      sip_port: parseInt(document.getElementById('sip-port').value, 10),
+      private_ip: document.getElementById('private-ip').value.trim(),
+      public_ip: document.getElementById('public-ip').value.trim()
+    };
+
+// Debug log to confirm what’s sent
+console.log("Sending config to backend:", config);
+
+    const btn = form.querySelector('button[type="submit"]');
+    const originalText = btn.innerHTML;
+    btn.innerHTML='<span class="material-symbols-rounded fa-spin">progress_activity</span> Applying...';
+    btn.disabled=true;
+
+    fetch('/api/ports_config',{ method:'POST', headers:{ 'Content-Type':'application/json' }, body:JSON.stringify(config) })
+      .then(res=>res.json())
+      .then(data=>{
+        if(data.status==='success'){
+          updateConfigUI(data.current_state);
+          showNotification(data.message,'success');
+          if(applyStatus) applyStatus.textContent=`Configuration applied. Containers restarted at ${new Date().toLocaleTimeString()}`;
+        } else showNotification(data.message||'Failed to apply configuration','error');
+      }).catch(()=>showNotification('Network error','error'))
+      .finally(()=>{ btn.innerHTML=originalText; btn.disabled=false; });
+  });
+
+  // Reset form
+  document.getElementById('reset-protocols').addEventListener('click',()=>{
+    form.reset();
+    h323Config.style.display='none';
+    sipConfig.style.display='none';
+    if(applyStatus) applyStatus.textContent='';
+  });
+});
+</script>
+{% endblock %}

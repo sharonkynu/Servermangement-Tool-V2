@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}License Management{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>License Management</h1>
+    <p>Licence Management of Managemnt and MCU services</p>
+</div>
+
+
+<div class="licence-container">
+  <!-- Management Key -->
+  <div class="config-card animate-in">
+    <h3>Management Key</h3>
+    <div class="input-group">
+      <input type="text" id="management-key" placeholder="Enter License Key">
+      <button class="update" onclick="updateLicence('management')">Update License</button>
+      <div class="current-key" id="management-current">Current: loading...</div>
+      <button class="restart" onclick="restartStack('management')">Restart Management Stack</button>
+    </div>
+  </div>
+
+  <!-- MCU Key -->
+  <div class="config-card animate-in">
+    <h3>MCU Key</h3>
+    <div class="input-group">
+      <input type="text" id="mcu-key" placeholder="Enter MCU License Key">
+      <button class="update" onclick="updateLicence('mcu')">Update License</button>
+      <div class="current-key" id="mcu-current">Current: loading...</div>
+      <button class="restart" onclick="restartStack('mcu')">Restart MCU Stack</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  loadCurrentKeys();
+});
+
+function showToast(message, type="success") {
+  const toast = document.getElementById("toast");
+  toast.textContent = message;
+  toast.className = `toast show ${type}`;
+  setTimeout(() => toast.className = "toast", 3000);
+}
+
+function loadCurrentKeys() {
+  fetch("/api/licence_get")
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById("management-current").textContent =
+        "Current: " + (data.LICENCE_KEY_MANAGEMENT || "Not Set");
+      document.getElementById("mcu-current").textContent =
+        "Current: " + (data.LICENCE_KEY_MCU || "Not Set");
+    })
+    .catch(() => showToast("Failed to load current keys", "error"));
+}
+
+function updateLicence(target) {
+  const keyInput = target === "management"
+    ? document.getElementById("management-key").value
+    : document.getElementById("mcu-key").value;
+
+  if (!keyInput.trim()) {
+    showToast("Please enter a key before updating", "error");
+    return;
+  }
+
+  fetch("/api/licence_update", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ target, key_value: keyInput })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.status === "success") {
+      showToast(data.message, "success");
+      loadCurrentKeys();
+    } else {
+      showToast(data.message, "error");
+    }
+  })
+  .catch(() => showToast("Failed to update license", "error"));
+}
+
+function restartStack(target) {
+  fetch("/api/docker_compose_restart", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ target })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.status === "success") {
+      showToast(data.message, "success");
+    } else {
+      showToast(data.message, "error");
+    }
+  })
+  .catch(() => showToast("Restart failed", "error"));
+}
+</script>
+{% endblock %}

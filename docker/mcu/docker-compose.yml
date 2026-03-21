@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  voip_server:
+    environment:
+    - H323_ENABLED=true
+    - SIP_ENABLED=true
+    - H323_PORT=8111
+    - SIP_PORT=4441
+    - MAX_CONNECTIONS=100
+    - LOG_LEVEL=debug
+    - PRIVATE_IP=192.168.1.1110
+    - PUBLIC_IP=203.0.113.2222
+    - LICENCE_KEY_MCU=ASDFG1234
+    image: voip_server:latest
+    ports:
+    - 6000:6000
+    - 5060:5060

@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Server Management</title>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0"
+    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/next_level.css') }}">
+  <script>
+    (function () {
+      let savedTheme = localStorage.getItem('theme');
+      if (!savedTheme || savedTheme === 'system') {
+        // Default to light if no valid explicit theme is found
+        savedTheme = 'light';
+        localStorage.setItem('theme', savedTheme);
+      }
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
+
+  <style>
+    body.split-login {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--bg-main);
+      font-family: 'Inter', sans-serif;
+    }
+
+    .split-card {
+      display: flex;
+      width: 100%;
+      max-width: 950px;
+      min-height: 600px;
+      background: var(--bg-card);
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+    }
+
+    /* Left Side: Solid Radiant Blue Gradient */
+    .split-left {
+      flex: 0 0 45%;
+      background: linear-gradient(135deg, #004ecc 0%, #0078ff 100%);
+      color: #ffffff;
+      padding: 60px 40px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    [data-theme="dark"] .split-left {
+      background: linear-gradient(135deg, #18181b 0%, #000000 100%);
+    }
+
+    .split-left h2 {
+      margin: 0 0 16px 0;
+      font-size: 48px;
+      font-weight: 900;
+      letter-spacing: -1.5px;
+      text-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+      line-height: 1.1;
+      position: relative;
+      z-index: 10;
+      color: #ffffff;
+    }
+
+    .split-left p.subtitle {
+      margin: 0;
+      font-size: 18px;
+      color: rgba(255, 255, 255, 0.85);
+      font-weight: 400;
+      line-height: 1.6;
+      max-width: 95%;
+      position: relative;
+      z-index: 10;
+    }
+
+    /* Node graphic simulation */
+    .network-graphic {
+      margin: auto 0;
+      position: relative;
+      height: 300px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .central-node {
+      width: 80px;
+      height: 80px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      box-shadow: 0 0 0 15px rgba(255, 255, 255, 0.05);
+      z-index: 2;
+    }
+
+    .orbit-node {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    .n1 {
+      top: 10%;
+      left: 20%;
+    }
+
+    .n2 {
+      top: 20%;
+      right: 15%;
+    }
+
+    .n3 {
+      bottom: 25%;
+      left: 15%;
+    }
+
+    .n4 {
+      bottom: 15%;
+      right: 25%;
+    }
+
+    .n5 {
+      top: 50%;
+      left: 5%;
+    }
+
+    .n6 {
+      top: 50%;
+      right: 5%;
+    }
+
+    .network-lines {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      background:
+        linear-gradient(to bottom right, transparent 49%, rgba(255, 255, 255, 0.1) 49%, rgba(255, 255, 255, 0.1) 51%, transparent 51%),
+        linear-gradient(to top right, transparent 49%, rgba(255, 255, 255, 0.1) 49%, rgba(255, 255, 255, 0.1) 51%, transparent 51%);
+      background-size: 100% 100%;
+      z-index: 1;
+    }
+
+    /* Right Side: Plain Solid White Component matching Blue+White aesthetic */
+    .split-right {
+      flex: 1;
+      padding: 60px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+    }
+
+    .right-content-wrapper {
+      width: 100%;
+      max-width: 380px;
+      margin: 0 auto;
+    }
+
+    .split-right h1 {
+      margin: 0 0 10px 0;
+      font-size: 34px;
+      color: var(--text-main);
+      font-weight: 800;
+      letter-spacing: -1px;
+    }
+
+    .split-right p.intro {
+      margin: 0 0 40px 0;
+      color: var(--text-muted);
+      font-size: 16px;
+      font-weight: 500;
+    }
+
+    .form-group {
+      margin-bottom: 28px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 10px;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+    }
+
+    .form-group input[type="text"],
+    .form-group input[type="password"] {
+      width: 100%;
+      padding: 18px 20px;
+      border: 1px solid var(--input-border);
+      border-radius: 10px;
+      font-size: 16px;
+      color: var(--text-main);
+      background: var(--input-bg);
+      box-sizing: border-box;
+      outline: none;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02) inset;
+    }
+
+    .form-group input:focus {
+      border-color: var(--primary-btn);
+      box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+    }
+
+    .btn-sign-in {
+      width: 100%;
+      padding: 16px;
+      background: var(--primary-btn);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+      transition: all 0.2s ease;
+      margin-top: 20px;
+    }
+
+    .btn-sign-in:hover {
+      background: var(--primary-btn-hover);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .flash-messages {
+      margin-bottom: 25px;
+    }
+
+    .flash-message {
+      padding: 14px;
+      border-radius: 8px;
+      font-size: 14px;
+      margin-bottom: 15px;
+    }
+
+    .flash-success {
+      background: #d1fae5;
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+    }
+
+    .flash-error {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+
+    /* Top Right Controls Wrapper */
+    .top-right-controls {
+      position: absolute;
+      top: 24px;
+      right: 24px;
+      z-index: 1000;
+    }
+
+    @media (max-width: 900px) {
+      .split-card {
+        flex-direction: column;
+        max-width: 500px;
+        min-height: auto;
+      }
+
+      .split-left {
+        display: none;
+      }
+
+      .split-right {
+        padding: 40px;
+      }
+    }
+  </style>
+</head>
+
+<body class="split-login">
+
+  <div class="top-right-controls">
+    <button id="theme-icon-btn" class="theme-icon-btn" onclick="toggleThemeCycle()" title="Toggle Theme">
+      <span class="material-symbols-rounded">computer</span>
+    </button>
+  </div>
+
+  <div class="split-card">
+    <div class="split-left">
+      <h2>Server Management</h2>
+
+      <div class="network-graphic">
+        <div class="network-lines"></div>
+        <div class="orbit-node n1"><span class="material-symbols-rounded">bar_chart</span></div>
+        <div class="orbit-node n2"><span class="material-symbols-rounded">cloud</span></div>
+        <div class="orbit-node n3"><span class="material-symbols-rounded">security</span></div>
+        <div class="orbit-node n4"><span class="material-symbols-rounded">my_location</span></div>
+        <div class="orbit-node n5"><span class="material-symbols-rounded">show_chart</span></div>
+        <div class="orbit-node n6"><span class="material-symbols-rounded">circle</span></div>
+        <div class="central-node"><span class="material-symbols-rounded">dns</span></div>
+      </div>
+    </div>
+
+    <div class="split-right">
+      <div class="right-content-wrapper">
+        <h1>Welcome back</h1>
+        <p class="intro">Please enter your details to sign in.</p>
+
+        <div class="flash-messages">
+          {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+          {% for category, message in messages %}
+          <div class="flash-message flash-{{ category }}">
+            {{ message }}
+          </div>
+          {% endfor %}
+          {% endif %}
+          {% endwith %}
+        </div>
+
+        <form method="POST" autocomplete="off">
+          <div class="form-group">
+            <label>USERNAME</label>
+            <input type="text" name="username" placeholder="••••••••@••••••••.com" required>
+          </div>
+
+          <div class="form-group">
+            <label>PASSWORD</label>
+            <input type="password" name="password" placeholder="••••••••" required>
+          </div>
+
+          <button type="submit" class="btn-sign-in">Sign In</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const themes = ['light', 'dark'];
+    const icons = { 'light': 'light_mode', 'dark': 'dark_mode' };
+
+    function updateThemeIcon(theme) {
+      const btn = document.getElementById('theme-icon-btn');
+      if (btn) {
+        btn.innerHTML = `<span class="material-symbols-rounded">${icons[theme]}</span>`;
+      }
+    }
+
+    function changeTheme(value) {
+      localStorage.setItem('theme', value);
+      document.documentElement.setAttribute('data-theme', value);
+    }
+
+    function toggleThemeCycle() {
+      let current = localStorage.getItem('theme');
+      if (!current || !themes.includes(current)) current = 'light';
+      let nextIndex = (themes.indexOf(current) + 1) % themes.length;
+      let nextTheme = themes[nextIndex];
+      changeTheme(nextTheme);
+      updateThemeIcon(nextTheme);
+    }
+
+    // Initialize icon
+    let currentTheme = localStorage.getItem('theme');
+    if (!currentTheme || !themes.includes(currentTheme)) {
+      currentTheme = 'light';
+      localStorage.setItem('theme', currentTheme);
+    }
+    updateThemeIcon(currentTheme);
+
+    document.addEventListener('DOMContentLoaded', function () {
+      const form = document.querySelector('form');
+      const submitBtn = document.querySelector('.btn-sign-in');
+
+      if (form && submitBtn) {
+        form.addEventListener('submit', function () {
+          submitBtn.innerHTML = '<span class="material-symbols-rounded fa-spin">progress_activity</span> Signing In...';
+          submitBtn.style.opacity = '0.7';
+          submitBtn.style.pointerEvents = 'none';
+        });
+      }
+    });
+  </script>
+</body>
+
+</html>

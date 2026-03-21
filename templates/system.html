@@ -1,0 +1,250 @@
+{% extends "base.html" %}
+
+{% block title %}System Information - Server Management{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>System Information</h1>
+    <p>Real-time system metrics and hardware details</p>
+</div>
+
+<div class="system-grid">
+    <!-- System Overview Card -->
+    <div class="info-card">
+        <div class="card-header">
+            <div class="card-icon">
+                <span class="material-symbols-rounded">computer</span>
+            </div>
+            <h3>System Overview</h3>
+        </div>
+        <div class="card-content">
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="info-label">Operating System</span>
+                    <span class="info-value" id="os-info">{{ system_info.os_info }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Serial Number</span>
+                    <span class="info-value" id="serial-number">{{ system_info.serial_number }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">MAC Address</span>
+                    <span class="info-value" id="mac-address">{{ system_info.mac_address }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">IP Address</span>
+                    <span class="info-value" id="ip-address">{{ system_info.ip }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!-- CPU Information Card -->
+<div class="info-card">
+    <div class="card-header">
+        <div class="card-icon">
+            <span class="material-symbols-rounded">memory</span>
+        </div>
+        <h3>CPU Information</h3>
+        <div class="refresh-indicator">
+            <span class="material-symbols-rounded" id="cpu-refresh">sync</span>
+        </div>
+    </div>
+    <div class="card-content">
+        <div class="metric-display">
+            <div class="metric-value" id="cpu-percent">{{ system_info['cpu_percent'] }}%</div>
+            <div class="metric-label">Current Usage</div>
+        </div>
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="cpu-progress" style="width: {{ system_info['cpu_percent'] }}%"></div>
+            </div>
+            <!-- <span class="progress-text" id="cpu-text">{{ system_info['cpu_percent'] }}%</span> -->
+        </div>
+        <div class="cpu-details">
+            <div class="detail-item">
+                <span class="detail-label">CPU Count:</span>
+                <span class="detail-value" id="cpu-count">{{ system_info['cpu_count'] if 'cpu_count' in system_info else 'N/A' }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">CPU Frequency (MHz):</span>
+                <span class="detail-value" id="cpu-freq">{{ system_info['cpu_freq'] if 'cpu_freq' in system_info else 'N/A' }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- Memory Information Card -->
+    <div class="info-card">
+        <div class="card-header">
+            <div class="card-icon">
+                <span class="material-symbols-rounded">memory</span>
+            </div>
+            <h3>Memory Information</h3>
+            <div class="refresh-indicator">
+                <span class="material-symbols-rounded" id="memory-refresh">sync</span>
+            </div>
+        </div>
+        <div class="card-content">
+            <div class="metric-display">
+                <div class="metric-value" id="memory-percent">{{ system_info.memory_percent }}%</div>
+                <div class="metric-label">Memory Usage</div>
+            </div>
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="memory-progress" style="width: {{ system_info.memory_percent }}%"></div>
+                </div>
+                <!-- <span class="progress-text" id="memory-text">{{ system_info.memory_percent }}%</span> -->
+            </div>
+            <div class="memory-details">
+                <div class="detail-item">
+                    <span class="detail-label">Total Memory:</span>
+                    <span class="detail-value" id="memory-total">{{ system_info.memory_total }} GB</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Used Memory:</span>
+                    <span class="detail-value" id="memory-used">{{ system_info.memory_used }} GB</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Available:</span>
+                    <span class="detail-value" id="memory-available">{{ "%.2f"|format(system_info.memory_total - system_info.memory_used) }} GB</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!-- Root Disk Information Card -->
+<div class="info-card">
+    <div class="card-header">
+        <div class="card-icon"><span class="material-symbols-rounded">hard_drive</span></div>
+        <h3>Disk Usage</h3>
+    </div>
+
+    <div class="card-content">
+        <div class="metric-display">
+            <div class="metric-value" id="disk-percent">{{ system_info.disk_percent }}%</div>
+            <div class="metric-label">Disk Usage</div>
+        </div>
+
+        <div class="disk-details">
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="disk-progress-fill" style="width:0%;"></div>
+                </div>
+                <!-- <span class="progress-text" id="disk-progress-text">0%</span> -->
+                <!--<span class="progress-text" id="disk-progress-text">{{ system_info.disk_percent }}%</span>-->
+            </div>
+
+            <div class="detail-item">
+                <span class="detail-label">Total Disk:</span>
+                <span class="detail-value" id="disk-total">{{ system_info.disk_total }} GB</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Used:</span>
+                <span class="detail-value" id="disk-used">{{ system_info.disk_used }} GB</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Free:</span>
+                <span class="detail-value" id="disk-free">{{ system_info.disk_free }} GB</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+async function fetchRootDisk() {
+    try {
+        const response = await fetch('/api/disk_info');
+        const data = await response.json();
+        if (data.disks.length === 0) return;
+
+        const disk = data.disks[0];
+        const percent = Math.round((disk.used / disk.total) * 100);
+
+        // Update number details
+        document.getElementById('disk-total').innerText = disk.total + ' GB';
+        document.getElementById('disk-used').innerText = disk.used + ' GB';
+        document.getElementById('disk-free').innerText = disk.free + ' GB';
+
+        // Animate progress bar
+        document.getElementById('disk-progress-fill').style.width = percent + '%';
+        document.getElementById('disk-progress-text').innerText = percent + '%';
+
+    } catch (err) {
+        console.error('Error fetching disk info:', err);
+    }
+}
+
+// Initial fetch
+fetchRootDisk();
+
+// Refresh on sync click
+document.getElementById('disk-refresh').addEventListener('click', fetchRootDisk);
+</script>
+
+
+<!-- Network Interfaces Card -->
+<div class="info-card">
+    <div class="card-header">
+        <div class="card-icon">
+            <span class="material-symbols-rounded">lan</span>
+        </div>
+        <h3>Active Network Interface</h3>
+    </div>
+    <div class="card-content">
+        <div class="interface-item">
+            <div class="interface-name">
+                <span>{{ system_info.primary_interface }} </span>
+                {% if system_info.ip != "N/A" %}
+                <span class="interface-status active">Active</span>
+                {% else %}
+                <span class="interface-status inactive">Inactive</span>
+                {% endif %}
+            </div>
+            <div class="interface-details">
+                <div class="interface-detail">
+                    <span class="detail-label">IP Address:</span>
+                    <span class="detail-value">{{ system_info.ip }}</span>
+                </div>
+                <div class="interface-detail">
+                    <span class="detail-label">MAC Address:</span>
+                    <span class="detail-value">{{ system_info.mac_address }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+    <!-- System Uptime Card -->
+    <div class="info-card">
+        <div class="card-header">
+            <div class="card-icon">
+                <span class="material-symbols-rounded">schedule</span>
+            </div>
+            <h3>System Uptime</h3>
+        </div>
+        <div class="card-content">
+            <div class="uptime-display">
+                <div class="uptime-value metric-value" id="uptime-value">{{ "%.0f"|format(system_info.uptime / 3600) }}h</div>
+                <div class="uptime-label">Hours</div>
+            </div>
+            <div class="uptime-details">
+                <div class="uptime-details small-text">
+                    <div class="uptime-item">
+                        <span class="uptime-label">Boot Time:</span>
+                        <span class="uptime-value" id="boot-time">{{ system_info.get('boot_time', 'N/A') }}</span>
+                    </div>
+                    <div class="uptime-item">
+                        <span class="uptime-label">Current Time:</span>
+                        <span class="uptime-value" id="current-time">{{ system_info.get('current_time', 'N/A') }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

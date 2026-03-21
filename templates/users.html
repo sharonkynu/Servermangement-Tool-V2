@@ -1,0 +1,424 @@
+{% extends "base.html" %}
+
+{% block title %}User Management - Server Management{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>User Management</h1>
+    <p>Manage system users and their access permissions</p>
+</div>
+
+
+<div class="users-grid">
+
+    <!-- User Statistics -->
+    <div class="stats-card">
+        <div class="card-header">
+            <div class="card-icon">
+                <span class="material-symbols-rounded">pie_chart</span>
+            </div>
+            <h3>User Statistics</h3>
+        </div>
+        <div class="card-content">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-icon"><span class="material-symbols-rounded">group</span></div>
+                    <div class="stat-info">
+                        <span class="stat-label">Total Users</span>
+                        <span class="stat-value" id="total-users">0</span>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon"><span class="material-symbols-rounded">admin_panel_settings</span></div>
+                    <div class="stat-info">
+                        <span class="stat-label">Admin Users</span>
+                        <span class="stat-value" id="admin-users">0</span>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon"><span class="material-symbols-rounded">person</span></div>
+                    <div class="stat-info">
+                        <span class="stat-label">Regular Users</span>
+                        <span class="stat-value" id="regular-users">0</span>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon"><span class="material-symbols-rounded">schedule</span></div>
+                    <div class="stat-info">
+                        <span class="stat-label">Last Login</span>
+                        <span class="stat-value" id="last-login">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- User List -->
+    <div class="users-card">
+        <div class="card-header">
+            <div class="card-icon">
+                <span class="material-symbols-rounded">group</span>
+            </div>
+            <h3>System Users</h3>
+            <div class="card-controls">
+                <button class="control-btn" id="refresh-users">
+                    <span class="material-symbols-rounded">sync</span> Refresh
+                </button>
+                <button class="control-btn btn-primary" id="add-user-btn">
+                    <span class="material-symbols-rounded">add</span> Add User
+                </button>
+            </div>
+        </div>
+        <div class="card-content">
+            <div class="users-table">
+                <div class="table-header">
+                    <div class="table-cell">Username</div>
+                    <div class="table-cell">Role</div>
+                    <div class="table-cell">Created</div>
+                    <div class="table-cell">Actions</div>
+                </div>
+                <div class="table-body" id="users-table-body">
+                    <!-- Users will be populated by JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit User Drawer Popup -->
+    <div id="user-form-overlay" class="drawer-overlay" style="display:none;"></div>
+    <div class="user-form-drawer" id="user-form-card">
+        <div class="drawer-header">
+            <div class="card-icon">
+                <span class="material-symbols-rounded">manage_accounts</span>
+            </div>
+            <h3 id="form-title">Add New User</h3>
+            <button type="button" class="drawer-close" id="cancel-form" aria-label="Close"><span
+                    class="material-symbols-rounded">close</span></button>
+        </div>
+        <div class="drawer-content">
+            <form id="user-form">
+                <input type="hidden" id="edit-username" name="edit_username">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required>
+                    <small class="form-help">Enter a unique username</small>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="password-input">
+                        <input type="password" id="password" name="password" required>
+                        <button type="button" class="password-toggle" onclick="togglePassword()">
+                            <span class="material-symbols-rounded">visibility</span>
+                        </button>
+                    </div>
+                    <small class="form-help">Minimum 6 characters</small>
+                </div>
+                <div class="form-group">
+                    <label for="confirm-password">Confirm Password</label>
+                    <input type="password" id="confirm-password" name="confirm_password" required>
+                </div>
+                <div class="form-group">
+                    <label for="role">Role</label>
+                    <select id="role" name="role" required>
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                    <small class="form-help">Admin users can manage other users</small>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <span class="material-symbols-rounded">save</span>
+                        <span id="submit-text">Create User</span>
+                    </button>
+                    <button type="button" class="btn btn-secondary" id="drawer-cancel-btn">
+                        <span class="material-symbols-rounded">close</span> Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+
+    <!-- Security Settings removed per request -->
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal" id="delete-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Confirm Delete</h3>
+                <button class="modal-close" onclick="closeDeleteModal()"><span
+                        class="material-symbols-rounded">close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete user <strong id="delete-username"></strong>?</p>
+                <p class="warning-text">This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger" onclick="confirmDelete()"><span
+                        class="material-symbols-rounded">delete</span> Delete User</button>
+                <button class="btn btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Password Policy Modal removed -->
+    {% endblock %}
+
+    {% block extra_js %}
+    <script>
+        /* ------------------- Global Variables ------------------- */
+        let currentUsers = {};
+        let deleteUsername = '';
+
+        /* ------------------- Utility Functions ------------------- */
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.innerHTML = `<span class="material-symbols-rounded">star</span> ${message}`;
+            document.body.appendChild(notification);
+
+            setTimeout(() => notification.classList.add('show'), 100);
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => document.body.removeChild(notification), 300);
+            }, 3000);
+        }
+
+        /* ------------------- User Table & Stats ------------------- */
+        function updateUsersTable() {
+            const tableBody = document.getElementById('users-table-body');
+            if (!tableBody) return;
+            tableBody.innerHTML = '';
+            Object.keys(currentUsers).forEach(username => {
+                const user = currentUsers[username];
+                const row = document.createElement('div');
+                row.className = 'table-row';
+                row.innerHTML = `
+            <div class="table-cell">
+                <div class="user-info">
+                    <div class="user-avatar"><span class="material-symbols-rounded">person</span></div>
+                    <div class="user-details">
+                        <div class="user-name">${username}</div>
+                        <div class="user-role-badge role-${user.role}">${user.role}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="table-cell"><span class="role-badge role-${user.role}">${user.role}</span></div>
+            <div class="table-cell"><span class="created-date">${formatDate(user.created)}</span></div>
+            <div class="table-cell">
+                <div class="action-buttons">
+                    <button class="action-btn edit-btn" onclick="editUser('${username}')" title="Edit User">
+                        <span class="material-symbols-rounded">edit</span>
+                    </button>
+                    <button class="action-btn delete-btn" onclick="deleteUser('${username}')" title="Delete User">
+                        <span class="material-symbols-rounded">delete</span>
+                    </button>
+                </div>
+            </div>
+        `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        function updateUserStatistics() {
+            const totalUsers = Object.keys(currentUsers).length;
+            const adminUsers = Object.values(currentUsers).filter(u => u.role === 'admin').length;
+            const regularUsers = totalUsers - adminUsers;
+
+            document.getElementById('total-users').textContent = totalUsers;
+            document.getElementById('admin-users').textContent = adminUsers;
+            document.getElementById('regular-users').textContent = regularUsers;
+        }
+
+        /* ------------------- Load Users ------------------- */
+        function loadUsers() {
+            fetch('/api/users')
+                .then(r => r.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        currentUsers = data.users || {};
+                        updateUsersTable();
+                        updateUserStatistics();
+                    } else showNotification(data.error || 'Failed to load users', 'error');
+                })
+                .catch(() => showNotification('Network error occurred', 'error'));
+        }
+
+        /* ------------------- Form Handling ------------------- */
+        function showAddUserForm() {
+            const form = document.getElementById('user-form');
+            if (!form) return;
+            document.getElementById('form-title').textContent = 'Add New User';
+            document.getElementById('submit-text').textContent = 'Create User';
+            document.getElementById('edit-username').value = '';
+            form.reset();
+            document.getElementById('user-form-overlay').style.display = 'block';
+            document.getElementById('user-form-card').classList.add('open');
+            setTimeout(() => {
+                document.getElementById('user-form-card').focus();
+            }, 300);
+        }
+
+        function hideUserForm() {
+            document.getElementById('user-form-overlay').style.display = 'none';
+            document.getElementById('user-form-card').classList.remove('open');
+            const usernameInput = document.getElementById('username');
+            if (usernameInput) usernameInput.readOnly = false;
+        }
+
+        function submitUserForm() {
+            const form = document.getElementById('user-form');
+            if (!form) return;
+            const fd = new FormData(form);
+            const username = fd.get('username');
+            const password = fd.get('password');
+            const confirmPassword = fd.get('confirm_password');
+            const role = fd.get('role');
+            const editUsername = fd.get('edit_username');
+
+            if (password !== confirmPassword) {
+                showNotification('Passwords do not match!', 'error'); return;
+            }
+            if (password.length < 6) {
+                showNotification('Password must be at least 6 characters!', 'error'); return;
+            }
+
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const origText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<span class="material-symbols-rounded fa-spin">progress_activity</span> Saving...';
+            submitBtn.disabled = true;
+
+            const userData = { username, password, role };
+            const url = editUsername ? `/api/users/${editUsername}` : '/api/users';
+            const method = editUsername ? 'PUT' : 'POST';
+
+            fetch(url, {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(userData)
+            })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        showNotification(data.message, 'success');
+                        loadUsers();
+                        hideUserForm();
+                    } else showNotification(data.message || 'Failed to save user', 'error');
+                })
+                .catch(() => showNotification('Network error occurred', 'error'))
+                .finally(() => {
+                    submitBtn.innerHTML = origText;
+                    submitBtn.disabled = false;
+                });
+        }
+
+        /* ------------------- Edit/Delete ------------------- */
+        function editUser(username) {
+            const user = currentUsers[username];
+            if (!user) return;
+            showAddUserForm();
+            document.getElementById('form-title').textContent = 'Edit User';
+            document.getElementById('submit-text').textContent = 'Update User';
+            document.getElementById('edit-username').value = username;
+            document.getElementById('username').value = username;
+            document.getElementById('username').readOnly = true;
+            document.getElementById('password').value = user.password;
+            document.getElementById('confirm-password').value = user.password;
+            document.getElementById('role').value = user.role;
+        }
+
+        function deleteUser(username) {
+            deleteUsername = username;
+            const el = document.getElementById('delete-username');
+            if (el) el.textContent = username;
+            document.getElementById('delete-modal').style.display = 'block';
+        }
+
+        function confirmDelete() {
+            const btn = document.querySelector('#delete-modal .btn-danger');
+            const origText = btn.innerHTML;
+            btn.innerHTML = '<span class="material-symbols-rounded fa-spin">progress_activity</span> Deleting...';
+            btn.disabled = true;
+
+            fetch(`/api/users/${deleteUsername}`, { method: 'DELETE' })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        showNotification(data.message, 'success');
+                        loadUsers();
+                        closeDeleteModal();
+                    } else showNotification(data.message || 'Failed to delete user', 'error');
+                })
+                .catch(() => showNotification('Network error occurred', 'error'))
+                .finally(() => { btn.innerHTML = origText; btn.disabled = false; });
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('delete-modal').style.display = 'none';
+            deleteUsername = '';
+        }
+
+        /* ------------------- Misc ------------------- */
+        function togglePassword() {
+            const input = document.getElementById('password');
+            const icon = document.querySelector('.password-toggle i');
+            if (input.type === 'password') { input.type = 'text'; icon.classList.replace('fa-eye', 'fa-eye-slash'); }
+            else { input.type = 'password'; icon.classList.replace('fa-eye-slash', 'fa-eye'); }
+        }
+
+        function configurePasswordPolicy() { document.getElementById('password-policy-modal').style.display = 'block'; }
+        function closePasswordPolicyModal() { document.getElementById('password-policy-modal').style.display = 'none'; }
+        function savePasswordPolicy() {
+            showNotification('Password policy updated successfully!', 'success');
+            closePasswordPolicyModal();
+        }
+        function saveSecuritySettings() { showNotification('Security settings updated successfully!', 'success'); }
+        function resetSecuritySettings() {
+            document.getElementById('session-timeout').value = '60';
+            document.getElementById('max-attempts').value = '5';
+            showNotification('Security settings reset to defaults', 'info');
+        }
+
+        /* ------------------- DOMContentLoaded ------------------- */
+        document.addEventListener('DOMContentLoaded', function () {
+            loadUsers();
+
+            const userForm = document.getElementById('user-form');
+            if (userForm) userForm.addEventListener('submit', e => { e.preventDefault(); submitUserForm(); });
+
+
+            // Drawer close (X) and Cancel button
+            const cancelBtn = document.getElementById('cancel-form');
+            if (cancelBtn) cancelBtn.addEventListener('click', hideUserForm);
+            const drawerCancelBtn = document.getElementById('drawer-cancel-btn');
+            if (drawerCancelBtn) drawerCancelBtn.addEventListener('click', hideUserForm);
+
+            // Overlay click closes drawer
+            const overlay = document.getElementById('user-form-overlay');
+            if (overlay) overlay.addEventListener('click', hideUserForm);
+
+            const addBtn = document.getElementById('add-user-btn');
+            if (addBtn) addBtn.addEventListener('click', showAddUserForm);
+
+            const refreshBtn = document.getElementById('refresh-users');
+            if (refreshBtn) refreshBtn.addEventListener('click', loadUsers);
+
+            const cards = document.querySelectorAll('.users-card, .stats-card, .security-card');
+            cards.forEach((card, i) => {
+                card.style.animationDelay = `${i * 0.1}s`;
+                card.classList.add('animate-in');
+            });
+        });
+
+        /* ------------------- Close Modals on Outside Click ------------------- */
+        window.onclick = function (event) {
+            if (event.target === document.getElementById('delete-modal')) closeDeleteModal();
+            if (event.target === document.getElementById('password-policy-modal')) closePasswordPolicyModal();
+        }
+    </script>
+    {% endblock %}

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Server Management{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/next_level.css') }}">
+    <script>
+      (function() {
+        let savedTheme = localStorage.getItem('theme');
+        if (!savedTheme || savedTheme === 'system') {
+          // Default to light if no valid explicit theme is found
+          savedTheme = 'light';
+          localStorage.setItem('theme', savedTheme);
+        }
+        document.documentElement.setAttribute('data-theme', savedTheme);
+      })();
+    </script>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    {% if session.user %}
+    <nav class="navbar">
+        <div class="nav-brand">
+            <span class="material-symbols-rounded">dns</span>
+            <span>Server Management</span>
+        </div>
+        <div class="nav-menu">
+<!--
+            <a href="{{ url_for('dashboard') }}" class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}">
+                <span class="material-symbols-rounded">dashboard</span>
+                <span>Dashboard</span>
+            </a>
+-->
+            <a href="{{ url_for('system_page') }}" class="nav-link {% if request.endpoint == 'system_page' %}active{% endif %}">
+                <span class="material-symbols-rounded">memory</span>
+                <span>System</span>
+            </a>
+            <a href="{{ url_for('network_page') }}" class="nav-link {% if request.endpoint == 'network_page' %}active{% endif %}">
+                <span class="material-symbols-rounded">lan</span>
+                <span>Network</span>
+            </a>
+
+            <a href="{{ url_for('remote_check_page') }}" class="nav-link {% if request.endpoint == 'remote_check_page' %}active{% endif %}">
+                <span class="material-symbols-rounded">search</span>
+                <span>Remote Check</span>
+            </a>
+            <a href="{{ url_for('ports_page') }}" class="nav-link {% if request.endpoint == 'ports_page' %}active{% endif %}">
+                <span class="material-symbols-rounded">power</span>
+                <span>H323/SIP</span>
+            </a>
+
+
+            <a href="{{ url_for('port_config_page') }}" class="nav-link {% if request.endpoint == 'port_config_page' %}active{% endif %}">
+                <span class="material-symbols-rounded">settings_suggest</span>
+                <span>Port Configuration</span>
+            </a>
+
+
+            {% if session.role == 'admin' %}
+            <a href="{{ url_for('users_page') }}" class="nav-link {% if request.endpoint == 'users_page' %}active{% endif %}">
+                <span class="material-symbols-rounded">group</span>
+                <span>Users</span>
+            </a>
+            {% endif %}
+            <a href="{{ url_for('ssl_page') }}" class="nav-link {% if request.endpoint == 'ssl_page' %}active{% endif %}">
+                <span class="material-symbols-rounded">security</span>
+                <span>SSL</span>
+            </a>
+
+            <a href="{{ url_for('licence_page') }}" class="nav-link {% if request.endpoint == 'licence_page' %}active{% endif %}">
+                <span class="material-symbols-rounded">security</span>
+                <span>LICENCE</span>
+            </a>
+            
+        </div>
+        <div class="nav-user">
+            <span class="user-info">
+                <span class="material-symbols-rounded">person</span>
+                {{ session.user }} ({{ session.role }})
+            </span>
+            <a href="{{ url_for('logout') }}" class="logout-btn">
+                <span class="material-symbols-rounded">logout</span>
+                Logout
+            </a>
+        </div>
+    </nav>
+    {% endif %}
+
+    <main class="main-content">
+        <div class="top-bar">
+            <button id="theme-icon-btn" class="theme-icon-btn" onclick="toggleThemeCycle()">
+                <span class="material-symbols-rounded">light_mode</span>
+            </button>
+        </div>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="flash-message flash-{{ category }}">
+                            <span class="material-symbols-rounded">star</span>
+                            {{ message }}
+                            <button class="flash-close" onclick="this.parentElement.remove()">
+                                <span class="material-symbols-rounded">close</span>
+                            </button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+      const themes = ['light', 'dark'];
+      const icons = { 'light': 'light_mode', 'dark': 'dark_mode' };
+
+      function updateThemeIcon(theme) {
+        const btn = document.getElementById('theme-icon-btn');
+        if (btn) {
+          btn.innerHTML = `<span class="material-symbols-rounded">${icons[theme]}</span>`;
+        }
+      }
+
+      function changeTheme(value) {
+        localStorage.setItem('theme', value);
+        document.documentElement.setAttribute('data-theme', value);
+      }
+
+      function toggleThemeCycle() {
+        let current = localStorage.getItem('theme');
+        if (!current || !themes.includes(current)) current = 'light';
+        let nextIndex = (themes.indexOf(current) + 1) % themes.length;
+        let nextTheme = themes[nextIndex];
+        changeTheme(nextTheme);
+        updateThemeIcon(nextTheme);
+      }
+
+      // Initialize icon
+      let currentTheme = localStorage.getItem('theme');
+      if (!currentTheme || !themes.includes(currentTheme)) {
+        currentTheme = 'light';
+        localStorage.setItem('theme', currentTheme);
+      }
+      updateThemeIcon(currentTheme);
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
