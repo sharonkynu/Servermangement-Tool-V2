@@ -16,6 +16,9 @@
                 <span class="material-symbols-rounded">computer</span>
             </div>
             <h3>System Overview</h3>
+            <div class="refresh-indicator">
+                <span class="material-symbols-rounded" id="overview-refresh">sync</span>
+            </div>
         </div>
         <div class="card-content">
             <div class="info-grid">
@@ -118,6 +121,9 @@
     <div class="card-header">
         <div class="card-icon"><span class="material-symbols-rounded">hard_drive</span></div>
         <h3>Disk Usage</h3>
+        <div class="refresh-indicator">
+            <span class="material-symbols-rounded" id="disk-refresh">sync</span>
+        </div>
     </div>
 
     <div class="card-content">
@@ -129,10 +135,8 @@
         <div class="disk-details">
             <div class="progress-container">
                 <div class="progress-bar">
-                    <div class="progress-fill" id="disk-progress-fill" style="width:0%;"></div>
+                    <div class="progress-fill" id="disk-progress-fill" style="width: {{ system_info.disk_percent }}%;"></div>
                 </div>
-                <!-- <span class="progress-text" id="disk-progress-text">0%</span> -->
-                <!--<span class="progress-text" id="disk-progress-text">{{ system_info.disk_percent }}%</span>-->
             </div>
 
             <div class="detail-item">
@@ -151,37 +155,6 @@
     </div>
 </div>
 
-<script>
-async function fetchRootDisk() {
-    try {
-        const response = await fetch('/api/disk_info');
-        const data = await response.json();
-        if (data.disks.length === 0) return;
-
-        const disk = data.disks[0];
-        const percent = Math.round((disk.used / disk.total) * 100);
-
-        // Update number details
-        document.getElementById('disk-total').innerText = disk.total + ' GB';
-        document.getElementById('disk-used').innerText = disk.used + ' GB';
-        document.getElementById('disk-free').innerText = disk.free + ' GB';
-
-        // Animate progress bar
-        document.getElementById('disk-progress-fill').style.width = percent + '%';
-        document.getElementById('disk-progress-text').innerText = percent + '%';
-
-    } catch (err) {
-        console.error('Error fetching disk info:', err);
-    }
-}
-
-// Initial fetch
-fetchRootDisk();
-
-// Refresh on sync click
-document.getElementById('disk-refresh').addEventListener('click', fetchRootDisk);
-</script>
-
 
 <!-- Network Interfaces Card -->
 <div class="info-card">
@@ -190,26 +163,67 @@ document.getElementById('disk-refresh').addEventListener('click', fetchRootDisk)
             <span class="material-symbols-rounded">lan</span>
         </div>
         <h3>Active Network Interface</h3>
+        <div class="refresh-indicator">
+            <span class="material-symbols-rounded" id="network-refresh">sync</span>
+        </div>
     </div>
     <div class="card-content">
-        <div class="interface-item">
-            <div class="interface-name">
-                <span>{{ system_info.primary_interface }} </span>
-                {% if system_info.ip != "N/A" %}
-                <span class="interface-status active">Active</span>
-                {% else %}
-                <span class="interface-status inactive">Inactive</span>
-                {% endif %}
+        <div class="info-grid">
+            <div class="info-item">
+                <span class="info-label">Interface Name</span>
+                <span class="info-value">
+                    {{ system_info.primary_interface }} 
+                    {% if system_info.ip != "N/A" %}
+                    <span class="interface-status active">Active</span>
+                    {% else %}
+                    <span class="interface-status inactive">Inactive</span>
+                    {% endif %}
+                </span>
             </div>
-            <div class="interface-details">
-                <div class="interface-detail">
-                    <span class="detail-label">IP Address:</span>
-                    <span class="detail-value">{{ system_info.ip }}</span>
-                </div>
-                <div class="interface-detail">
-                    <span class="detail-label">MAC Address:</span>
-                    <span class="detail-value">{{ system_info.mac_address }}</span>
-                </div>
+            <div class="info-item">
+                <span class="info-label">IP Address</span>
+                <span class="info-value">{{ system_info.ip }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">MAC Address</span>
+                <span class="info-value">{{ system_info.mac_address }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Gateway Info</span>
+                <span class="info-value">{{ system_info.get('gateway', 'Unavailable') }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- System Load & Performance Card -->
+<div class="info-card">
+    <div class="card-header">
+        <div class="card-icon">
+            <span class="material-symbols-rounded">monitoring</span>
+        </div>
+        <h3>System Performance</h3>
+        <div class="refresh-indicator">
+            <span class="material-symbols-rounded" id="performance-refresh">sync</span>
+        </div>
+    </div>
+    <div class="card-content">
+        <div class="info-grid">
+            <div class="info-item">
+                <span class="info-label">Load Average (1m)</span>
+                <span class="info-value">{{ "%.2f"|format(system_info.load_avg[0]) }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Running Processes</span>
+                <span class="info-value">{{ system_info.process_count }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Disk Read Speed</span>
+                <span class="info-value">{{ system_info.read_speed }} KB/s</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Disk Write Speed</span>
+                <span class="info-value">{{ system_info.write_speed }} KB/s</span>
             </div>
         </div>
     </div>
@@ -224,6 +238,9 @@ document.getElementById('disk-refresh').addEventListener('click', fetchRootDisk)
                 <span class="material-symbols-rounded">schedule</span>
             </div>
             <h3>System Uptime</h3>
+            <div class="refresh-indicator">
+                <span class="material-symbols-rounded" id="uptime-refresh">sync</span>
+            </div>
         </div>
         <div class="card-content">
             <div class="uptime-display">
@@ -247,4 +264,21 @@ document.getElementById('disk-refresh').addEventListener('click', fetchRootDisk)
 </div>
 
 
+{% block extra_js %}
+<script>
+function addRefreshAnimation(elementId) {
+    const el = document.getElementById(elementId);
+    if (!el) return;
+    el.classList.add('refresh-spin');
+    setTimeout(() => el.classList.remove('refresh-spin'), 1000);
+}
+
+document.querySelectorAll('.refresh-indicator span').forEach(btn => {
+    btn.addEventListener('click', () => {
+        addRefreshAnimation(btn.id);
+        setTimeout(() => location.reload(), 600);
+    });
+});
+</script>
+{% endblock %}
 {% endblock %}

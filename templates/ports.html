@@ -27,9 +27,10 @@ input:checked + .slider { background-color:var(--primary-btn); }
 input:checked + .slider:before { transform:translateX(26px); }
 
 /* --- Form --- */
-.config-grid { display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-top:15px; }
-.form-group label { display:block; font-weight:500; margin-bottom:5px; color:var(--text-main); }
-input[type="number"], input[type="text"] { width:100%; padding:8px 10px; border-radius:6px; border:1px solid var(--border-color); background:var(--input-bg); color:var(--input-text); transition:border 0.3s ease; }
+.config-grid { display:grid; grid-template-columns:repeat(2, 1fr); gap:20px; margin-top:15px; width: 100%; }
+.form-group { width: 100%; }
+.form-group label { display:block; font-weight:500; margin-bottom:8px; color:var(--text-main); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; }
+input[type="number"], input[type="text"] { width:100% !important; padding:10px 12px !important; border-radius:8px !important; border:1px solid var(--border-color) !important; background:var(--input-bg) !important; color:var(--input-text) !important; transition:all 0.3s ease !important; box-sizing: border-box !important; font-size: 1rem !important; }
 input:focus { border-color:var(--primary-btn); outline:none; }
 
 /* --- Buttons --- */

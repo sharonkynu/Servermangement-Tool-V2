@@ -63,7 +63,7 @@ body {
     position: fixed !important;
     top: 0 !important;
     left: 0 !important;
-    width: 250px !important;
+    width: 280px !important;
     height: 100vh !important;
     flex-direction: column !important;
     align-items: flex-start !important;
@@ -165,11 +165,25 @@ body {
 
 /* Main Content Layout */
 .main-content {
-    margin-left: 250px !important;
+    margin-left: 280px !important;
     padding: 40px !important;
-    width: calc(100% - 250px) !important;
+    width: calc(100% - 280px) !important;
+    max-width: none !important;
     background: var(--bg-main) !important;
     min-height: 100vh !important;
+}
+
+/* Expansion to fill screen and reduce right-side whitespace */
+.dashboard-grid, .users-grid, .reports-grid, .ports-grid, .dns-grid {
+    max-width: 1600px !important;
+    width: 100% !important;
+    margin: 0 auto !important;
+}
+.config-card, .stats-card, .info-card, .results-card, .licence-container, .setup-box, .content-container {
+    max-width: 1400px !important;
+    width: 100% !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
 }
 
 /* Card Overrides */
@@ -284,6 +298,32 @@ body {
     color: var(--text-main) !important;
 }
 
+/* Refresh Icon Spin Animation */
+@keyframes refresh-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+.refresh-spin {
+    animation: refresh-spin 0.8s ease-in-out !important;
+}
+
+.refresh-indicator span {
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+.refresh-indicator span:hover {
+    color: var(--primary-btn);
+}
+
+/* Network Page Fixes */
+.manual-config, #dns-manual-config, .dns-manual-config {
+    background: var(--bg-card) !important;
+    border-color: var(--border-color) !important;
+}
+.manual-config .form-group, .manual-config label {
+    color: var(--text-main) !important;
+}
+
 
 /* Icons, buttons, progress fills */
 .card-icon, .service-icon {
@@ -298,9 +338,18 @@ body {
     box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
 }
 .drop-box {
-    background: var(--sidebar-bg) !important;
-    color: var(--sidebar-text) !important;
+    background: var(--primary-btn) !important;
+    color: white !important;
     border-radius: 12px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 10px !important;
+    border: 2px dashed rgba(255,255,255,0.3) !important;
+}
+.drop-box span, .drop-box p, .drop-box .status {
+    color: white !important;
 }
 
 .action-btn {
@@ -315,7 +364,11 @@ body {
 }
 
 /* General Buttons */
-.btn-primary, button[type="submit"]:not(.drawer-close), .login-btn, .btn-upload, .btn-restart, .update, .restart {
+.btn-primary, button[type="submit"]:not(.drawer-close), .login-btn, .btn-upload, .btn-restart, .update, .restart, .btn-secondary, .btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 10px !important;
     background: var(--primary-btn) !important;
     color: white !important;
     border-radius: 10px !important;
@@ -325,6 +378,14 @@ body {
     font-weight: 700 !important;
     box-shadow: 0 6px 15px rgba(0, 102, 255, 0.2) !important;
     transition: all 0.2s ease !important;
+    text-align: center !important;
+}
+
+.btn-secondary {
+    background: var(--bg-card) !important;
+    color: var(--text-main) !important;
+    border: 1px solid var(--border-color) !important;
+    box-shadow: none !important;
 }
 
 .btn-primary:hover, button[type="submit"]:not(.drawer-close):hover, .login-btn:hover, .btn-upload:hover, .btn-restart:hover, .update:hover, .restart:hover {
@@ -334,7 +395,7 @@ body {
 }
 
 /* Form inputs styling */
-input[type="text"], input[type="password"], input[type="email"], select, textarea {
+input[type="text"], input[type="password"], input[type="email"], input[type="number"], select, textarea {
     border: 1px solid var(--input-border) !important;
     border-radius: 10px !important;
     background: var(--input-bg) !important;

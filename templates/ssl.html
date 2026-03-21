@@ -15,14 +15,14 @@
       <h3 style="margin:0; font-size:18px;">Upload Certificate (.cert)</h3>
     </div>
     <div class="card-content">
-      <div class="drop-box" style="padding: 40px 20px; text-align: center; border: 2px dashed var(--border-color); cursor: pointer; transition: all 0.2s; margin-bottom: 20px;" onclick="document.getElementById('certFile').click()" onmouseover="this.style.borderColor='var(--primary-btn)'" onmouseout="this.style.borderColor='var(--border-color)'">
+      <div class="drop-box" onclick="document.getElementById('certFile').click()">
         <input type="file" id="certFile" style="display:none" accept=".cert" onchange="showSelectedFile('certFile','certStatus')">
-        <span class="material-symbols-rounded" style="font-size: 32px; color: var(--text-muted); margin-bottom:10px;">upload_file</span>
-        <p id="certStatus" style="margin:0; font-weight: 600;">Click or drag .cert file here</p>
+        <span class="material-symbols-rounded" style="font-size: 32px;">upload_file</span>
+        <p id="certStatus" class="status">Click or drag .cert file here</p>
       </div>
-      <div class="form-actions" style="display: flex; gap: 15px;">
-        <button class="btn btn-primary" onclick="uploadSSL('cert')" style="flex:1;"><span class="material-symbols-rounded">upload</span> Upload</button>
-        <button class="btn btn-secondary" onclick="resetFile('certFile','certStatus')" style="flex:1;"><span class="material-symbols-rounded">delete</span> Remove</button>
+      <div class="form-actions">
+        <button class="btn btn-primary" onclick="uploadSSL('cert')"><span class="material-symbols-rounded">upload</span> Upload</button>
+        <button class="btn btn-secondary" onclick="resetFile('certFile','certStatus')"><span class="material-symbols-rounded">delete</span> Remove</button>
       </div>
     </div>
   </div>
@@ -34,14 +34,14 @@
       <h3 style="margin:0; font-size:18px;">Upload Private Key (.key)</h3>
     </div>
     <div class="card-content">
-      <div class="drop-box" style="padding: 40px 20px; text-align: center; border: 2px dashed var(--border-color); cursor: pointer; transition: all 0.2s; margin-bottom: 20px;" onclick="document.getElementById('keyFile').click()" onmouseover="this.style.borderColor='var(--primary-btn)'" onmouseout="this.style.borderColor='var(--border-color)'">
+      <div class="drop-box" onclick="document.getElementById('keyFile').click()">
         <input type="file" id="keyFile" style="display:none" accept=".key" onchange="showSelectedFile('keyFile','keyStatus')">
-        <span class="material-symbols-rounded" style="font-size: 32px; color: var(--text-muted); margin-bottom:10px;">vpn_key</span>
-        <p id="keyStatus" style="margin:0; font-weight: 600;">Click or drag .key file here</p>
+        <span class="material-symbols-rounded" style="font-size: 32px;">vpn_key</span>
+        <p id="keyStatus" class="status">Click or drag .key file here</p>
       </div>
-      <div class="form-actions" style="display: flex; gap: 15px;">
-        <button class="btn btn-primary" onclick="uploadSSL('key')" style="flex:1;"><span class="material-symbols-rounded">upload</span> Upload</button>
-        <button class="btn btn-secondary" onclick="resetFile('keyFile','keyStatus')" style="flex:1;"><span class="material-symbols-rounded">delete</span> Remove</button>
+      <div class="form-actions">
+        <button class="btn btn-primary" onclick="uploadSSL('key')"><span class="material-symbols-rounded">upload</span> Upload</button>
+        <button class="btn btn-secondary" onclick="resetFile('keyFile','keyStatus')"><span class="material-symbols-rounded">delete</span> Remove</button>
       </div>
     </div>
   </div>

@@ -129,8 +129,16 @@ document.addEventListener("DOMContentLoaded", () => {
       .then(res => res.json())
       .then(data => {
         if (data.status === 'success' && data.ports) {
-          // Use the complete list from API (defaults + extra open ports)
-          portsData = data.ports;
+          // Filter to show only SSH (22), HTTP (80), and HTTPS (443) as requested
+          const targetPorts = [22, 80, 443];
+          portsData = data.ports.filter(p => targetPorts.includes(p.port));
+          
+          // Sort them to keep order consistent: SSH, HTTP, HTTPS
+          portsData.sort((a, b) => {
+            if (a.port === 22) return -1;
+            if (b.port === 22) return 1;
+            return a.port - b.port;
+          });
         } else {
           console.warn("API returned non-success status for check_port_status");
         }

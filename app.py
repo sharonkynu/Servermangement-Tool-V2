@@ -203,6 +203,92 @@ def get_network_info():
     return info
 
 
+# Global storage for I/O tracking
+last_disk_io = None
+last_io_time = None
+
+# Global storage for I/O tracking and background metrics
+last_disk_io = None
+last_io_time = None
+cached_system_stats = {
+    'read_speed': 0,
+    'write_speed': 0,
+    'serial_number': 'Unknown'
+}
+
+def start_background_monitor():
+    """Background thread to sample real-time metrics"""
+    import threading, time, psutil, os
+    global last_disk_io, last_io_time, cached_system_stats
+    
+    # One-time Serial Detection
+    serial = "Unknown"
+    try:
+        import subprocess
+        # Priority 1: dmidecode (requires sudo, but try the non-interactive check)
+        try:
+            res = subprocess.check_output(
+                ["sudo", "-n", "dmidecode", "-s", "system-serial-number"],
+                text=True, stderr=subprocess.DEVNULL
+            ).strip()
+            if res and res.lower() not in ['not specified', 'unknown', 'to be filled by oem', 'serial number']:
+                serial = res
+        except:
+            pass
+
+        # Priority 2: Sysfs (direct kernel info)
+        if (not serial or serial == "Unknown"):
+            for path in ['/sys/class/dmi/id/product_serial', '/sys/devices/virtual/dmi/id/product_serial']:
+                if os.path.exists(path):
+                    with open(path, 'r') as f:
+                        val = f.read().strip()
+                        if val and val.lower() not in ['not specified', 'unknown', 'to be filled by oem']:
+                            serial = val
+                            break
+        
+        # Priority 3: machine-id (always exists on systemd linux)
+        if (not serial or serial == "Unknown"):
+            for path in ['/etc/machine-id', '/var/lib/dbus/machine-id']:
+                if os.path.exists(path):
+                    with open(path, 'r') as f:
+                        # Use the first 12 chars as a unique identifier
+                        serial = "SID-" + f.read().strip()[:12].upper()
+                        break
+        
+        # Priority 4: node name (hostname)
+        if not serial or serial == "Unknown":
+            import platform
+            serial = "SID-" + platform.node().upper()
+    except Exception as e:
+        # Final emergency fallback
+        import platform
+        serial = "SID-" + platform.node().upper()
+    
+    cached_system_stats['serial_number'] = serial
+
+    def monitor():
+        global last_disk_io, last_io_time, cached_system_stats
+        while True:
+            try:
+                now = time.time()
+                curr_io = psutil.disk_io_counters()
+                if last_disk_io and last_io_time:
+                    dt = now - last_io_time
+                    if dt > 0:
+                        cached_system_stats['read_speed'] = round((curr_io.read_bytes - last_disk_io.read_bytes) / dt / 1024, 2)
+                        cached_system_stats['write_speed'] = round((curr_io.write_bytes - last_disk_io.write_bytes) / dt / 1024, 2)
+                last_disk_io = curr_io
+                last_io_time = now
+            except:
+                pass
+            time.sleep(2)
+
+    t = threading.Thread(target=monitor, daemon=True)
+    t.start()
+
+# Start the monitor when app loads
+start_background_monitor()
+
 def get_system_info():
     """Get comprehensive system information with true active route detection"""
     try:
@@ -267,15 +353,8 @@ def get_system_info():
                     'mac': mac
                 })
 
-        # Serial number
-        serial = "Unknown"
-        try:
-            serial = subprocess.check_output(
-                ["sudo", "-n", "dmidecode", "-s", "system-serial-number"],
-                text=True
-            ).strip()
-        except Exception:
-            pass
+        # Serial number from cache
+        serial = cached_system_stats.get('serial_number', 'Unknown')
 
         # OS info
         os_info = f"{platform.system()} {platform.release()}"
@@ -297,6 +376,10 @@ def get_system_info():
         boot_time_dt = datetime.datetime.fromtimestamp(psutil.boot_time())
         current_time_dt = datetime.datetime.now()
 
+        # Real-time Disk I/O speed from cache
+        read_kb = cached_system_stats.get('read_speed', 0)
+        write_kb = cached_system_stats.get('write_speed', 0)
+
         return {
             'ip': primary_ip,
             'netmask': netmask,
@@ -313,11 +396,15 @@ def get_system_info():
             'disk_used': round(disk.used / (1024**3), 2),
             'disk_free': round(disk.free / (1024**3), 2),
             'disk_percent': int(disk.percent),
+            'read_speed': round(read_kb, 2),
+            'write_speed': round(write_kb, 2),
             'serial_number': serial,
             'os_info': os_info,
             'uptime': time.time() - psutil.boot_time(),
             'boot_time': boot_time_dt.strftime("%Y-%m-%d %H:%M:%S"),
             'current_time': current_time_dt.strftime("%Y-%m-%d %H:%M:%S"),
+            'load_avg': os.getloadavg() if hasattr(os, 'getloadavg') else [0, 0, 0],
+            'process_count': len(psutil.pids()),
             'network_interfaces': interfaces
         }
 
