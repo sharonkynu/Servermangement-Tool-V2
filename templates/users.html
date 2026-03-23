@@ -237,6 +237,11 @@
 
         /* ------------------- Load Users ------------------- */
         function loadUsers() {
+            // Spin the refresh icon while loading
+            const refreshBtn = document.getElementById('refresh-users');
+            const refreshIcon = refreshBtn ? refreshBtn.querySelector('.material-symbols-rounded') : null;
+            if (refreshIcon) refreshIcon.classList.add('refresh-spinning');
+
             fetch('/api/users')
                 .then(r => r.json())
                 .then(data => {
@@ -246,7 +251,10 @@
                         updateUserStatistics();
                     } else showNotification(data.error || 'Failed to load users', 'error');
                 })
-                .catch(() => showNotification('Network error occurred', 'error'));
+                .catch(() => showNotification('Network error occurred', 'error'))
+                .finally(() => {
+                    if (refreshIcon) refreshIcon.classList.remove('refresh-spinning');
+                });
         }
 
         /* ------------------- Form Handling ------------------- */

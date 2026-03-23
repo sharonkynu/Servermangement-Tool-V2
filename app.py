@@ -31,7 +31,7 @@ USERS_FILE = os.environ.get('USERS_FILE', 'users.json')
 DOCKER_COMPOSE_FILE = os.environ.get('DOCKER_COMPOSE_FILE', 'docker-compose.yml')
 COMPOSE_BASE_DIR = os.environ.get('COMPOSE_BASE_DIR', '/home/sharon/Pictures/ServerManagement/tst')
 HOST = os.environ.get('HOST', '0.0.0.0')
-PORT = int(os.environ.get('PORT', 8082))
+PORT = int(os.environ.get('PORT', 8085))
 
 CERT_PATH = os.environ.get('CERT_PATH', '/var/www/ssl/tst/tst.cert')
 KEY_PATH = os.environ.get('KEY_PATH', '/var/www/ssl/tst/tst.key')

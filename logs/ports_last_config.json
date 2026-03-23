@@ -1,0 +1,28 @@
+{
+  "ports": [
+    {
+      "enabled": false,
+      "id": "ssh",
+      "isDefault": true,
+      "name": "SSH",
+      "port": 22
+    },
+    {
+      "enabled": true,
+      "id": "http",
+      "isDefault": true,
+      "name": "HTTP",
+      "port": 80
+    },
+    {
+      "enabled": false,
+      "id": "https",
+      "isDefault": true,
+      "name": "HTTPS",
+      "port": 443
+    }
+  ],
+  "default_ports": [],
+  "custom_ports": [],
+  "timestamp": "2026-03-21T17:25:04.282218"
+}

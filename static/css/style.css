@@ -17,7 +17,7 @@
     height: 100vh;
     width: 100%;
     max-width: 420px;
-    background: rgba(255,255,255,0.98);
+    background: var(--bg-card, #ffffff);
     box-shadow: -4px 0 32px rgba(0,0,0,0.12);
     z-index: 2100;
     transform: translateX(100%);
@@ -36,7 +36,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 24px 28px 12px 28px;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid var(--border-color, #e5e7eb);
     background: transparent;
 }
 
@@ -53,14 +53,14 @@
     flex: 1;
     font-size: 20px;
     font-weight: 700;
-    color: #333;
+    color: var(--text-main, #333);
     margin: 0 10px;
 }
 
 .drawer-close {
     background: none;
     border: none;
-    color: #666;
+    color: var(--text-muted, #666);
     font-size: 22px;
     cursor: pointer;
     padding: 4px 8px;
@@ -68,8 +68,8 @@
     transition: background 0.2s;
 }
 .drawer-close:hover {
-    background: #f3f4f6;
-    color: #333;
+    background: var(--sidebar-hover, #f3f4f6);
+    color: var(--text-main, #333);
 }
 
 .drawer-content {
@@ -89,6 +89,28 @@
         padding-right: 16px;
     }
 }
+
+/* Drawer dark mode */
+[data-theme="dark"] .user-form-drawer {
+    background: var(--bg-card) !important;
+    box-shadow: -4px 0 32px rgba(0,0,0,0.4) !important;
+}
+[data-theme="dark"] .drawer-header {
+    border-bottom-color: var(--border-color) !important;
+}
+[data-theme="dark"] .drawer-header h3 {
+    color: var(--text-main) !important;
+}
+[data-theme="dark"] .drawer-close {
+    color: var(--text-muted) !important;
+}
+[data-theme="dark"] .drawer-close:hover {
+    background: var(--sidebar-hover) !important;
+    color: var(--text-main) !important;
+}
+[data-theme="dark"] .form-help {
+    color: var(--text-muted) !important;
+}
 /* Reset and Base Styles */
 * {
     margin: 0;
@@ -102,9 +124,6 @@ input[type="text"], input[type="password"], input[type="email"], input[type="num
     cursor: text !important;
     user-select: text !important;
     opacity: 1 !important;
-    background-color: white !important;
-    color: #333 !important;
-    border: 2px solid #e1e5e9 !important;
 }
 
 /* Login form specific fixes */
@@ -329,7 +348,6 @@ body {
     padding: 15px 30px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
     position: sticky;
     top: 0;
     z-index: 1000;
@@ -882,7 +900,7 @@ body {
 .metric-display .metric-value {
     font-size: 48px;
     font-weight: 700;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: #1e83ce;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -1025,7 +1043,7 @@ body {
 
 .uptime-value {
     font-weight: 700;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: #1e83ce;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -3334,7 +3352,6 @@ input[type="text"] {
 }
 
 button {
-  margin-top: 12px;
   padding: 10px 15px;
   border: none;
   border-radius: 8px;
