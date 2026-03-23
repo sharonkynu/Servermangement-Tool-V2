@@ -1126,8 +1126,8 @@ input:checked + .slider {
     font-size: 14px !important;
     font-weight: 600 !important;
     background: transparent !important;
-    color: #E83C3E !important;
-    border: 1.5px solid #E83C3E !important;
+    color: #1e83ce !important;
+    border: 1.5px solid #1e83ce !important;
     border-radius: 10px !important;
     cursor: pointer !important;
     box-shadow: none !important;
@@ -1136,10 +1136,9 @@ input:checked + .slider {
 }
 
 .btn-restart-stack:hover {
-    background: rgba(239, 68, 68, 0.08) !important;
-    border-color: #c42d2f !important;
-    color: #c42d2f !important;
-    box-shadow: 0 4px 12px rgba(232, 60, 62, 0.18) !important;
+    background: rgba(93, 109, 133, 0.08) !important;
+    border-color: #1e83ce !important;
+    color: #1e83ce !important;
     transform: translateY(-1px) !important;
 }
 
