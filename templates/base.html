@@ -34,10 +34,7 @@
 <body>
     {% if session.user %}
     <nav class="navbar">
-        <div class="nav-brand">
-            <img src="{{ url_for('static', filename='img/logo-tst.svg') }}" alt="Logo" class="nav-logo">
-            <span>System Management</span>
-        </div>
+
         <div class="nav-menu">
             <!--
             <a href="{{ url_for('dashboard') }}" class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}">
@@ -101,7 +98,10 @@
     <main class="main-content">
         <header class="top-header">
             <div class="header-left">
-                <span class="header-brand-text">System Management</span>
+                <span class="header-brand-text">        <div class="nav-brand">
+            <img src="{{ url_for('static', filename='img/logo-tst.svg') }}" alt="Logo" class="nav-logo">
+            <span>System Management</span>
+        </div>System Management</span>
             </div>
             <div class="header-right">
                 <button id="theme-icon-btn" class="theme-icon-btn" onclick="toggleThemeCycle()">
