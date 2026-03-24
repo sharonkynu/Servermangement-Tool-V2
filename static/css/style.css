@@ -1113,7 +1113,6 @@ body {
     backdrop-filter: blur(20px);
     border-radius: 20px;
     padding: 55px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.2);
     transition: all 0.3s ease;
     opacity: 0;
@@ -1296,9 +1295,10 @@ body {
 }
 
 .form-actions {
-    display: flex;
+    display: grid;
     gap: 15px;
     margin-top: 25px;
+    grid-template-columns: 1fr 1fr;
 }
 
 .btn {

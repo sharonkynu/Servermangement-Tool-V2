@@ -37,8 +37,8 @@ CERT_PATH = os.environ.get('CERT_PATH', '/var/www/ssl/tst/tst.cert')
 KEY_PATH = os.environ.get('KEY_PATH', '/var/www/ssl/tst/tst.key')
 
 
-#MANAGEMENT_DOCKER_PATH = os.getenv("MANAGEMENT_DOCKER_PATH", "/home/sharon/Pictures/ServerManagement/docker/management/")
-#MCU_DOCKER_PATH = os.getenv("MCU_DOCKER_PATH", "/ohome/sharon/Pictures/ServerManagement/docker/mcu")
+MANAGEMENT_DOCKER_PATH = os.getenv("MANAGEMENT_DOCKER_PATH", "/home/sharon/Pictures/ServerManagement/docker/management/")
+MCU_DOCKER_PATH = os.getenv("MCU_DOCKER_PATH", "/ohome/sharon/Pictures/ServerManagement/docker/mcu")
 
 # Encrypted keys (from env)
 MANAGEMENT_KEY = os.getenv("MANAGEMENT_KEY", "Not set")
@@ -318,10 +318,14 @@ def get_system_info():
 
         # Get actual route-based active interface
         primary_iface, primary_ip, primary_mac = get_real_active_interface()
-        # Get netmask
+        # Get netmask via psutil
         try:
-            addrs = netifaces.ifaddresses(primary_iface)
-            netmask = addrs[netifaces.AF_INET][0].get('netmask', 'Unavailable') if netifaces.AF_INET in addrs else 'Unavailable'
+            netmask = 'Unavailable'
+            if primary_iface in psutil.net_if_addrs():
+                for addr in psutil.net_if_addrs()[primary_iface]:
+                    if getattr(socket, 'AF_INET', None) == addr.family or str(addr.family) == 'AddressFamily.AF_INET':
+                        netmask = addr.netmask
+                        break
         except Exception:
             netmask = 'Unavailable'
 

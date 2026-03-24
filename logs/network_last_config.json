@@ -1,10 +1,10 @@
 {
-  "mode": "dhcp",
+  "mode": "manual",
   "ip_address": "",
   "netmask": "",
   "gateway": "",
   "dns_servers": null,
   "dns_config": {},
   "routes": [],
-  "timestamp": "2026-03-21T17:08:08.386250"
+  "timestamp": "2026-03-24T18:27:26.298137"
 }
