@@ -157,6 +157,20 @@
             updateThemeIcon(nextTheme);
         }
 
+        // Auto-dismiss flash messages after 2 seconds
+        document.addEventListener('DOMContentLoaded', () => {
+            const flashes = document.querySelectorAll('.flash-message');
+            flashes.forEach(flash => {
+                setTimeout(() => {
+                    if (flash && flash.parentElement) {
+                        flash.style.opacity = '0';
+                        flash.style.transition = 'opacity 0.5s ease';
+                        setTimeout(() => flash.remove(), 500);
+                    }
+                }, 2000); // 2 seconds
+            });
+        });
+
         // Initialize icon
         let currentTheme = localStorage.getItem('theme');
         if (!currentTheme || !themes.includes(currentTheme)) {

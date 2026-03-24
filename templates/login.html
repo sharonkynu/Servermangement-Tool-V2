@@ -14,7 +14,6 @@
     (function () {
       let savedTheme = localStorage.getItem('theme');
       if (!savedTheme || savedTheme === 'system') {
-        // Default to light if no valid explicit theme is found
         savedTheme = 'light';
         localStorage.setItem('theme', savedTheme);
       }
@@ -23,274 +22,302 @@
   </script>
 
   <style>
+    /* ============================================
+       LOGIN PAGE — MINIMALIST SPLIT (EXACT MATCH)
+       ============================================ */
+
     body.split-login {
       margin: 0;
       height: 100vh;
       display: flex;
-      align-items: center;
-      justify-content: center;
-      background-color: var(--bg-main);
-      font-family: 'Inter', sans-serif;
-    }
-
-    .split-card {
-      display: flex;
-      width: 100%;
-      max-width: 950px;
-      min-height: 600px;
-      background: var(--bg-card);
-      border-radius: 20px;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+      background-color: #ffffff !important;
+      font-family: 'Inter', sans-serif !important;
+      transition: background-color 0.3s ease;
       overflow: hidden;
-      border: 1px solid var(--border-color);
+      flex-direction: row !important;
     }
 
-    /* Left Side: Solid Radiant Blue Gradient */
+    [data-theme="dark"] body.split-login {
+      background-color: #0B0E14 !important;
+    }
+
+    .split-container {
+      display: flex;
+      width: 100vw;
+      height: 100vh;
+      flex-direction: row;
+    }
+
+    /* ---- LEFT PANEL: Blue Mesh Gradient ---- */
     .split-left {
-      flex: 0 0 45%;
-      background: linear-gradient(135deg, #004ecc 0%, #0078ff 100%);
-      color: #ffffff;
-      padding: 60px 40px;
-      display: flex;
-      flex-direction: column;
-      position: relative;
-    }
-
-    [data-theme="dark"] .split-left {
-      background: linear-gradient(135deg, #18181b 0%, #000000 100%);
-    }
-
-    .split-left h2 {
-      margin: 0 0 16px 0;
-      font-size: 48px;
-      font-weight: 900;
-      letter-spacing: -1.5px;
-      text-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-      line-height: 1.1;
-      position: relative;
-      z-index: 10;
-      color: #ffffff;
-    }
-
-    .split-left p.subtitle {
-      margin: 0;
-      font-size: 18px;
-      color: rgba(255, 255, 255, 0.85);
-      font-weight: 400;
-      line-height: 1.6;
-      max-width: 95%;
-      position: relative;
-      z-index: 10;
-    }
-
-    /* Node graphic simulation */
-    .network-graphic {
-      margin: auto 0;
-      position: relative;
-      height: 300px;
+      flex: 1;
+      background: linear-gradient(135deg, #0056D2 0%, #0076FF 50%, #4FA5FF 100%) !important;
       display: flex;
       align-items: center;
       justify-content: center;
+      position: relative;
+      overflow: hidden;
+      padding: 60px;
     }
 
-    .central-node {
-      width: 80px;
-      height: 80px;
-      background: rgba(255, 255, 255, 0.2);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 32px;
-      box-shadow: 0 0 0 15px rgba(255, 255, 255, 0.05);
-      z-index: 2;
-    }
-
-    .orbit-node {
+    /* Mesh effect using radial gradients to match the organic look */
+    .split-left::before {
+      content: '';
       position: absolute;
-      width: 40px;
-      height: 40px;
-      background: rgba(255, 255, 255, 0.15);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
-    }
-
-    .n1 {
-      top: 10%;
-      left: 20%;
-    }
-
-    .n2 {
-      top: 20%;
-      right: 15%;
-    }
-
-    .n3 {
-      bottom: 25%;
-      left: 15%;
-    }
-
-    .n4 {
-      bottom: 15%;
-      right: 25%;
-    }
-
-    .n5 {
-      top: 50%;
-      left: 5%;
-    }
-
-    .n6 {
-      top: 50%;
-      right: 5%;
-    }
-
-    .network-lines {
-      position: absolute;
-      width: 100%;
-      height: 100%;
       top: 0;
       left: 0;
-      background:
-        linear-gradient(to bottom right, transparent 49%, rgba(255, 255, 255, 0.1) 49%, rgba(255, 255, 255, 0.1) 51%, transparent 51%),
-        linear-gradient(to top right, transparent 49%, rgba(255, 255, 255, 0.1) 49%, rgba(255, 255, 255, 0.1) 51%, transparent 51%);
-      background-size: 100% 100%;
+      right: 0;
+      bottom: 0;
+      background: 
+        radial-gradient(circle at 70% 20%, rgba(255, 255, 255, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 10% 80%, rgba(0, 0, 0, 0.08) 0%, transparent 50%);
       z-index: 1;
     }
 
-    /* Right Side: Plain Solid White Component matching Blue+White aesthetic */
+    /* The soft curve/arc from the image */
+    .split-left::after {
+      content: '';
+      position: absolute;
+      width: 140%;
+      height: 140%;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, transparent 100%);
+      border-radius: 50%;
+      top: 5%;
+      right: -40%;
+      z-index: 2;
+    }
+
+    [data-theme="dark"] .split-left {
+      background: linear-gradient(145deg, #0B0E14 0%, #151921 100%) !important;
+    }
+
+    .brand-title {
+      color: #ffffff !important;
+      font-size: 72px;
+      font-weight: 800;
+      letter-spacing: -2.5px;
+      position: relative;
+      z-index: 10;
+      line-height: 1;
+      text-align: left;
+      width: 100%;
+      max-width: 500px;
+    }
+
+    /* ---- RIGHT PANEL: White Form ---- */
     .split-right {
       flex: 1;
-      padding: 60px 40px;
+      background: #ffffff !important;
       display: flex;
-      flex-direction: column;
+      align-items: center;
       justify-content: center;
+      padding: 40px;
+      transition: background 0.3s ease;
+    }
+
+    [data-theme="dark"] .split-right {
+      background: #0B0E14 !important;
+    }
+
+    .form-wrapper {
+      width: 100%;
+      max-width: 420px;
+      text-align: center;
       position: relative;
     }
 
-    .right-content-wrapper {
-      width: 100%;
-      max-width: 380px;
-      margin: 0 auto;
+    .form-wrapper h1 {
+      font-size: 38px !important;
+      font-weight: 800 !important;
+      margin: 0 0 10px 0 !important;
+      color: #1A1A1A !important;
+      letter-spacing: -1px !important;
+      text-shadow: none !important;
     }
 
-    .split-right h1 {
-      margin: 0 0 10px 0;
-      font-size: 34px;
-      color: var(--text-main);
-      font-weight: 800;
-      letter-spacing: -1px;
+    [data-theme="dark"] .form-wrapper h1 {
+      color: #F8FAFC !important;
     }
 
-    .split-right p.intro {
-      margin: 0 0 40px 0;
-      color: var(--text-muted);
-      font-size: 16px;
-      font-weight: 500;
+    .form-wrapper .subheader {
+      color: #64748B !important;
+      font-size: 16px !important;
+      margin: 0 0 48px 0 !important;
+      font-weight: 400 !important;
+    }
+
+    [data-theme="dark"] .form-wrapper .subheader {
+      color: #94A3B8 !important;
     }
 
     .form-group {
-      margin-bottom: 28px;
+      text-align: left !important;
+      margin-bottom: 24px !important;
     }
 
     .form-group label {
-      display: block;
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--text-main);
-      margin-bottom: 10px;
-      letter-spacing: 0.8px;
-      text-transform: uppercase;
+      display: block !important;
+      font-size: 13px !important;
+      font-weight: 800 !important;
+      color: #1A1A1A !important;
+      margin-bottom: 10px !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.5px !important;
     }
 
-    .form-group input[type="text"],
-    .form-group input[type="password"] {
-      width: 100%;
-      padding: 18px 20px;
-      border: 1px solid var(--input-border);
-      border-radius: 10px;
-      font-size: 16px;
-      color: var(--text-main);
-      background: var(--input-bg);
-      box-sizing: border-box;
-      outline: none;
-      transition: all 0.3s ease;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02) inset;
+    [data-theme="dark"] .form-group label {
+      color: #94A3B8 !important;
     }
 
-    .form-group input:focus {
-      border-color: var(--primary-btn);
-      box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+    .input-container {
+      position: relative !important;
     }
 
-    .btn-sign-in {
-      width: 100%;
-      padding: 16px;
-      background: var(--primary-btn);
-      color: #fff;
-      border: none;
-      border-radius: 10px;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
-      transition: all 0.2s ease;
-      margin-top: 20px;
+    .input-container input {
+      width: 100% !important;
+      padding: 16px 20px !important;
+      border: 1px solid #E2E8F0 !important;
+      border-radius: 10px !important;
+      font-size: 16px !important;
+      color: #1A1A1A !important;
+      background: #fcfcfc !important;
+      box-sizing: border-box !important;
+      outline: none !important;
+      transition: all 0.2s ease !important;
+      box-shadow: none !important;
     }
 
-    .btn-sign-in:hover {
-      background: var(--primary-btn-hover);
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-      transform: translateY(-2px);
+    [data-theme="dark"] .input-container input {
+      background: #151921 !important;
+      border-color: #1E293B !important;
+      color: #F8FAFC !important;
     }
 
+    .input-container input:focus {
+      border-color: #0076FF !important;
+      background: #ffffff !important;
+    }
+
+    [data-theme="dark"] .input-container input:focus {
+      border-color: #1E83CE !important;
+      background: #1F2937 !important;
+    }
+
+    .input-container .toggle-password {
+      position: absolute !important;
+      right: 18px !important;
+      top: 50% !important;
+      transform: translateY(-50%) !important;
+      cursor: pointer !important;
+      color: #94A3B8 !important;
+      opacity: 0.6;
+    }
+
+    .btn-continue, 
+    body.split-login .btn-continue,
+    body.split-login form .btn-continue {
+      width: 100% !important;
+      padding: 18px !important;
+      background: #E1F0FF !important; /* Extremely light blue-cyan matching image */
+      color: #1E83CE !important; /* Darker blue text */
+      border: none !important;
+      border-radius: 50px !important; /* Pill shape */
+      font-size: 17px !important;
+      font-weight: 800 !important;
+      cursor: pointer !important;
+      transition: all 0.2s ease !important;
+      margin-top: 24px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      box-shadow: none !important;
+      text-transform: none !important;
+      letter-spacing: normal !important;
+    }
+
+    [data-theme="dark"] .btn-continue,
+    [data-theme="dark"] body.split-login .btn-continue,
+    [data-theme="dark"] body.split-login form .btn-continue {
+      background: #1E83CE !important;
+      color: #FFFFFF !important;
+    }
+
+    .btn-continue:hover {
+      background: #D0E8FF !important;
+      transform: translateY(-1px) !important;
+    }
+
+    [data-theme="dark"] .btn-continue:hover {
+      background: #2594E8 !important;
+    }
+
+    /* Flash Messages */
     .flash-messages {
-      margin-bottom: 25px;
+      margin-bottom: 24px !important;
+      text-align: left !important;
     }
 
     .flash-message {
-      padding: 14px;
-      border-radius: 8px;
-      font-size: 14px;
-      margin-bottom: 15px;
-    }
-
-    .flash-success {
-      background: #d1fae5;
-      color: #065f46;
-      border: 1px solid #a7f3d0;
+      padding: 14px 18px !important;
+      border-radius: 10px !important;
+      font-size: 14px !important;
+      margin-bottom: 15px !important;
+      border-left: 5px solid !important;
+      animation: none !important;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05) !important;
     }
 
     .flash-error {
-      background: #fee2e2;
-      color: #991b1b;
-      border: 1px solid #fecaca;
+      background: #FEE2E2 !important;
+      color: #991B1B !important;
+      border-color: #EF4444 !important;
     }
 
-    /* Top Right Controls Wrapper */
+    /* Theme toggle button */
     .top-right-controls {
-      position: absolute;
-      top: 24px;
-      right: 24px;
-      z-index: 1000;
+      position: absolute !important;
+      top: 24px !important;
+      right: 24px !important;
+      z-index: 1000 !important;
     }
 
+    .theme-icon-btn {
+      background: #f1f5f9 !important;
+      border: 1px solid #e2e8f0 !important;
+      width: 44px !important;
+      height: 44px !important;
+      border-radius: 50% !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      cursor: pointer !important;
+      color: #64748B !important;
+      transition: all 0.2s ease !important;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05) !important;
+    }
+
+    [data-theme="dark"] .theme-icon-btn {
+      background: #1F2937 !important;
+      border-color: #374151 !important;
+      color: #94A3B8 !important;
+    }
+
+    .theme-icon-btn .material-symbols-rounded {
+      font-size: 22px !important;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* ---- RESPONSIVE ---- */
     @media (max-width: 900px) {
-      .split-card {
-        flex-direction: column;
-        max-width: 500px;
-        min-height: auto;
-      }
-
       .split-left {
-        display: none;
+        display: none !important;
       }
-
-      .split-right {
-        padding: 40px;
+      .form-wrapper h1 {
+        font-size: 32px !important;
       }
     }
   </style>
@@ -300,30 +327,19 @@
 
   <div class="top-right-controls">
     <button id="theme-icon-btn" class="theme-icon-btn" onclick="toggleThemeCycle()" title="Toggle Theme">
-      <span class="material-symbols-rounded">computer</span>
+      <span class="material-symbols-rounded">light_mode</span>
     </button>
   </div>
 
-  <div class="split-card">
+  <div class="split-container">
     <div class="split-left">
-      <h2>System Management</h2>
-
-      <div class="network-graphic">
-        <div class="network-lines"></div>
-        <div class="orbit-node n1"><span class="material-symbols-rounded">bar_chart</span></div>
-        <div class="orbit-node n2"><span class="material-symbols-rounded">cloud</span></div>
-        <div class="orbit-node n3"><span class="material-symbols-rounded">security</span></div>
-        <div class="orbit-node n4"><span class="material-symbols-rounded">my_location</span></div>
-        <div class="orbit-node n5"><span class="material-symbols-rounded">show_chart</span></div>
-        <div class="orbit-node n6"><span class="material-symbols-rounded">circle</span></div>
-        <div class="central-node"><span class="material-symbols-rounded">dns</span></div>
-      </div>
+      <div class="brand-title">System<br>Management</div>
     </div>
 
     <div class="split-right">
-      <div class="right-content-wrapper">
-        <h1>Welcome back</h1>
-        <p class="intro">Please enter your details to sign in.</p>
+      <div class="form-wrapper">
+        <h1>Sign In</h1>
+        <p class="subheader">Welcome back! Please sign in to your account</p>
 
         <div class="flash-messages">
           {% with messages = get_flashed_messages(with_categories=true) %}
@@ -339,16 +355,21 @@
 
         <form method="POST" autocomplete="off">
           <div class="form-group">
-            <label>USERNAME</label>
-            <input type="text" name="username" placeholder="••••••••@••••••••.com" required>
+            <label>Username</label>
+            <div class="input-container">
+              <input type="text" name="username" placeholder="Enter your username" required>
+            </div>
           </div>
 
           <div class="form-group">
-            <label>PASSWORD</label>
-            <input type="password" name="password" placeholder="••••••••" required>
+            <label>Password</label>
+            <div class="input-container">
+              <input type="password" id="password" name="password" placeholder="Enter your password" required>
+              <span class="material-symbols-rounded toggle-password" onclick="togglePassword()">visibility_off</span>
+            </div>
           </div>
 
-          <button type="submit" class="btn-sign-in">Sign In</button>
+          <button type="submit" class="btn-continue">Continue</button>
         </form>
       </div>
     </div>
@@ -379,6 +400,18 @@
       updateThemeIcon(nextTheme);
     }
 
+    function togglePassword() {
+      const pwd = document.getElementById('password');
+      const icon = document.querySelector('.toggle-password');
+      if (pwd.type === 'password') {
+        pwd.type = 'text';
+        icon.textContent = 'visibility';
+      } else {
+        pwd.type = 'password';
+        icon.textContent = 'visibility_off';
+      }
+    }
+
     // Initialize icon
     let currentTheme = localStorage.getItem('theme');
     if (!currentTheme || !themes.includes(currentTheme)) {
@@ -389,17 +422,21 @@
 
     document.addEventListener('DOMContentLoaded', function () {
       const form = document.querySelector('form');
-      const submitBtn = document.querySelector('.btn-sign-in');
+      const submitBtn = document.querySelector('.btn-continue');
 
       if (form && submitBtn) {
         form.addEventListener('submit', function () {
-          submitBtn.innerHTML = '<span class="material-symbols-rounded fa-spin">progress_activity</span> Signing In...';
+          submitBtn.innerHTML = '<span class="material-symbols-rounded" style="animation: spin 1s linear infinite;">progress_activity</span>';
           submitBtn.style.opacity = '0.7';
           submitBtn.style.pointerEvents = 'none';
         });
       }
     });
   </script>
+</body>
+
+</html>
+>
 </body>
 
 </html>
