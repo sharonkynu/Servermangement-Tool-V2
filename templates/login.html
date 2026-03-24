@@ -107,7 +107,7 @@
     /* ---- RIGHT PANEL: White Form ---- */
     .split-right {
       flex: 1;
-      background: #ffffff !important;
+      background: #fdfbfb !important;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -320,10 +320,28 @@
         font-size: 32px !important;
       }
     }
+
+    /* Absolute Top Left Logo for Login Page */
+    .login-logo-top {
+      position: absolute;
+      top: 24px;
+      left: 24px;
+      z-index: 1000;
+      transition: all 0.3s ease;
+    }
+    .login-logo-top img {
+      width: 48px;
+      height: 48px;
+      object-fit: contain;
+    }
   </style>
 </head>
 
 <body class="split-login">
+
+  <div class="login-logo-top">
+    <img src="{{ url_for('static', filename='img/logo-tst.svg') }}" alt="Logo">
+  </div>
 
   <div class="top-right-controls">
     <button id="theme-icon-btn" class="theme-icon-btn" onclick="toggleThemeCycle()" title="Toggle Theme">

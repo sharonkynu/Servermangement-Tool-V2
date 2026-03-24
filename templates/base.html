@@ -10,6 +10,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/next_level.css') }}">
+    <style>
+        .nav-logo {
+            width: 50px;
+            height: 40px;
+            object-fit: contain;
+        }
+    </style>
     <script>
         (function () {
             let savedTheme = localStorage.getItem('theme');
@@ -28,7 +35,7 @@
     {% if session.user %}
     <nav class="navbar">
         <div class="nav-brand">
-            <span class="material-symbols-rounded">dns</span>
+            <img src="{{ url_for('static', filename='img/logo-tst.svg') }}" alt="Logo" class="nav-logo">
             <span>System Management</span>
         </div>
         <div class="nav-menu">
