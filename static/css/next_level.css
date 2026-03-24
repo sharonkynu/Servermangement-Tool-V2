@@ -257,7 +257,7 @@ body {
 .dashboard-card, .chart-card, .login-box, .setup-container, .setup-box, .settings-card, .remote-box, .status-card, .login-wrapper, .config-card, .licence-container, .content-container, .info-card, .stats-card, .users-card, .security-card, .results-card, .remote-input-card, .licence-card {
     background: var(--bg-card) !important;
     border: 1px solid var(--border-color) !important;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06) !important;
+    /* box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06) !important; */
     border-radius: 16px !important;
     transform: none !important;
     color: var(--text-main) !important;
@@ -289,11 +289,11 @@ body {
 }
 .page-header h1 {
     font-size: 36px !important;
-    margin-bottom: 15px !important;
+    margin-bottom: 0px !important;
 }
 
 .page-header p, .dashboard-header p, .setup-header p, .login-header p, p, span {
-    color: var(--text-muted) !important;
+    /* color: var(--text-muted) !important; */
     font-weight: 400 !important;
 }
 
