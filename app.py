@@ -388,7 +388,24 @@ def get_system_info():
         cpu_count = psutil.cpu_count()
         cpu_freq_info = psutil.cpu_freq()
         cpu_freq = round(cpu_freq_info.current, 2) if cpu_freq_info and cpu_freq_info.current else 'N/A'
-        cpu_percent = round(psutil.cpu_percent(interval=0.4), 1)
+        # Align dashboard CPU usage closer to `top` summary by sampling
+        # active CPU time components over a 1-second window.
+        cpu_times = psutil.cpu_times_percent(interval=1)
+        cpu_percent = round(
+            max(
+                0.0,
+                min(
+                    100.0,
+                    float(getattr(cpu_times, 'user', 0.0))
+                    + float(getattr(cpu_times, 'system', 0.0))
+                    + float(getattr(cpu_times, 'nice', 0.0))
+                    + float(getattr(cpu_times, 'irq', 0.0))
+                    + float(getattr(cpu_times, 'softirq', 0.0))
+                    + float(getattr(cpu_times, 'steal', 0.0))
+                ),
+            ),
+            1,
+        )
         mem = psutil.virtual_memory()
         disk = psutil.disk_usage('/')
         boot_time_dt = datetime.datetime.fromtimestamp(psutil.boot_time())
