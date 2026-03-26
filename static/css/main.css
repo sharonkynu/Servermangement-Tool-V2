@@ -304,7 +304,7 @@
   position: fixed;
   top: 20px;
   right: -400px;
-  background: var(--bg-card, #ffffff);
+  background: var(--bg-card, #f8fafc);
   color: var(--text-main, #212529);
   padding: 10px 15px;
   border-radius: 8px;
@@ -431,7 +431,7 @@
 
 /* line 211, static/scss/_utilities.scss */
 .segmented-control {
-  background: var(--input-bg, #ffffff);
+  background: var(--input-bg, #fdfeff);
   border: 1px solid var(--border-color, #dee2e6);
   border-radius: 50px;
   padding: 6px;
@@ -469,7 +469,7 @@
 /* Global Layout & Base Styles */
 /* line 4, static/scss/pages/base.scss */
 body {
-  background: var(--bg-main, #f8f9fa) !important;
+  background: var(--bg-main, #f3f5f8) !important;
   color: var(--text-main, #212529) !important;
   display: flex;
   flex-direction: row;
@@ -490,7 +490,7 @@ body {
   flex: 1;
   margin-left: 100px;
   padding: 40px;
-  background: var(--bg-main, #f8f9fa);
+  background: var(--bg-main, #f3f5f8);
   min-height: 100vh;
 }
 
@@ -881,7 +881,7 @@ body.split-login {
 .mode-helper-box {
   border: 1px solid var(--border-color, #dee2e6);
   border-radius: 10px;
-  background: var(--bg-main, #f8f9fa);
+  background: var(--bg-main, #f3f5f8);
   padding: 12px 14px;
   margin-bottom: 14px;
 }
@@ -930,7 +930,7 @@ body.split-login {
   padding: 6px 10px;
   border-radius: 6px;
   border: 1px solid var(--border-color, #dee2e6);
-  background: var(--input-bg, #ffffff);
+  background: var(--input-bg, #fdfeff);
   color: var(--input-text, #495057);
 }
 
@@ -956,7 +956,7 @@ body.split-login {
 
 /* line 15, static/scss/pages/ports.scss */
 .config-card {
-  background: var(--bg-card, #ffffff);
+  background: var(--bg-card, #f8fafc);
   border-radius: 16px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
   width: 90%;
@@ -996,7 +996,7 @@ body.split-login {
   border-radius: 12px;
   padding: 15px;
   margin-bottom: 15px;
-  background: var(--bg-main, #f8f9fa);
+  background: var(--bg-main, #f3f5f8);
   transition: all 0.3s ease;
 }
 
@@ -1064,7 +1064,7 @@ body.split-login {
 
 /* line 111, static/scss/pages/ports.scss */
 .ports-table {
-  background: var(--bg-main, #f8f9fa);
+  background: var(--bg-main, #f3f5f8);
   border-radius: 8px;
   padding: 15px;
   max-height: 500px;
@@ -1076,7 +1076,7 @@ body.split-login {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: var(--bg-card, #ffffff);
+  background: var(--bg-card, #f8fafc);
   border: 1px solid var(--border-color, #dee2e6);
   border-radius: 6px;
   padding: 12px;
@@ -1177,7 +1177,7 @@ body.split-login {
 .ports-grid .config-card {
   border: 1px solid var(--border-color, #dee2e6);
   border-radius: 12px;
-  background: var(--bg-card, #ffffff);
+  background: var(--bg-card, #f8fafc);
   overflow: hidden;
   min-height: 260px;
   display: flex;
@@ -1358,7 +1358,7 @@ body.split-login {
 
 /* line 177, static/scss/pages/port-config.scss */
 .ports-grid--port-config .config-card {
-  background: var(--bg-card, #ffffff);
+  background: var(--bg-card, #f8fafc);
   border-color: var(--border-color, #dee2e6);
 }
 
@@ -1504,7 +1504,7 @@ body.split-login {
 
 /* line 9, static/scss/pages/ssl.scss */
 .dashboard-card {
-  background: var(--bg-card, #ffffff);
+  background: var(--bg-card, #f8fafc);
   padding: 25px;
   border-radius: 16px;
   border: 1px solid var(--border-color, #dee2e6);
@@ -1628,7 +1628,7 @@ body.split-login {
   border: 1px solid rgba(var(--primary-btn, #007bff), 0.25);
   border-radius: 8px;
   padding: 6px 8px;
-  background: var(--bg-main, #f8f9fa);
+  background: var(--bg-main, #f3f5f8);
   color: var(--text-main, #212529);
   font-size: 12px;
   outline: none;
@@ -1664,7 +1664,7 @@ body.split-login {
 .system-grid .info-card {
   border: 1px solid var(--border-color, #dee2e6);
   border-radius: 12px;
-  background: var(--bg-card, #ffffff);
+  background: var(--bg-card, #f8fafc);
   overflow: hidden;
 }
 
@@ -1780,7 +1780,7 @@ body.split-login {
 
 /* line 9, static/scss/pages/users.scss */
 .user-card {
-  background: var(--bg-card, #ffffff);
+  background: var(--bg-card, #f8fafc);
   padding: 25px;
   border-radius: 16px;
   border: 1px solid var(--border-color, #dee2e6);
@@ -2164,7 +2164,7 @@ body.split-login {
 
 /* line 23, static/scss/pages/remote-check.scss */
 .remote-input-card {
-  background: var(--bg-card, #ffffff);
+  background: var(--bg-card, #f8fafc);
   padding: 24px;
   border-radius: 16px;
   border: 1px solid var(--border-color, #dee2e6);
@@ -2236,7 +2236,7 @@ body.split-login {
 .remote-input-card .input-group .input-field input {
   border: 1px solid var(--border-color, #dee2e6);
   border-radius: 8px;
-  background: var(--bg-main, #f8f9fa);
+  background: var(--bg-main, #f3f5f8);
   color: var(--text-main, #212529);
   padding: 11px 12px;
   transition: border-color 0.2s ease, background 0.2s ease;
@@ -2315,7 +2315,7 @@ body.split-login {
 
 /* line 158, static/scss/pages/remote-check.scss */
 .results-card {
-  background: var(--bg-card, #ffffff);
+  background: var(--bg-card, #f8fafc);
   border-radius: 12px;
   border: 1px solid var(--border-color, #dee2e6);
   display: flex;
@@ -2401,7 +2401,7 @@ body.split-login {
 
 /* line 223, static/scss/pages/remote-check.scss */
 .results-card .output-box {
-  background: var(--bg-main, #f8f9fa);
+  background: var(--bg-main, #f3f5f8);
   color: var(--text-main, #212529);
   padding: 15px;
   border-radius: 8px;
@@ -6721,8 +6721,8 @@ button.restart:hover {
 /* NEXT LEVEL OVERRIDES - THEME SWITCHING (LIGHT/DARK) */
 /* line 3483, static/scss/_smv2-legacy-ui-and-theme.scss */
 :root {
-  --bg-main: #FBFBFB;
-  --bg-card: #ffffff;
+  --bg-main: #F3F5F8;
+  --bg-card: #F8FAFC;
   --text-main: #1A1A1A;
   --text-muted: #64748B;
   --border-color: #E2E8F0;
@@ -6731,7 +6731,7 @@ button.restart:hover {
   --sidebar-hover: rgba(30, 131, 206, 0.15);
   --primary-btn: #1E83CE;
   --primary-btn-hover: #166BA5;
-  --input-bg: #ffffff;
+  --input-bg: #FDFEFF;
   --input-border: #CBD5E1;
   --input-text: #1A1A1A;
   --table-header-bg: #EEF7FC;

@@ -3481,8 +3481,8 @@ button.restart:hover {
 @keyframes fadeInUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }/* NEXT LEVEL OVERRIDES - THEME SWITCHING (LIGHT/DARK) */
 
 :root {
-    --bg-main: #FBFBFB;
-    --bg-card: #ffffff;
+    --bg-main: #F3F5F8;
+    --bg-card: #F8FAFC;
     --text-main: #1A1A1A;
     --text-muted: #64748B;
     --border-color: #E2E8F0;
@@ -3491,7 +3491,7 @@ button.restart:hover {
     --sidebar-hover: rgba(30, 131, 206, 0.15);
     --primary-btn: #1E83CE;
     --primary-btn-hover: #166BA5;
-    --input-bg: #ffffff;
+    --input-bg: #FDFEFF;
     --input-border: #CBD5E1;
     --input-text: #1A1A1A;
     --table-header-bg: #EEF7FC;
