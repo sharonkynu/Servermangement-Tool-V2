@@ -16,7 +16,8 @@
       <p>Provide a valid host/IP and port, then run Ping, Telnet, or Traceroute.</p>
     </div>
     <div class="input-group">
-      <div class="input-field target-field">
+      <div class="port-adding-container">
+         <div class="input-field target-field">
         <label for="single-target">IP Address or Hostname</label>
         <input type="text" id="single-target" placeholder="e.g. 8.8.8.8 or example.com" autocomplete="off">
       </div>
@@ -24,6 +25,8 @@
         <label for="single-port">Port (Telnet)</label>
         <input type="number" id="single-port" placeholder="1-65535" min="1" max="65535" step="1">
       </div>
+      </div>
+     
       <div class="action-btn-container">
         <button class="btn btn-purple" id="btn-ping">
           <span class="material-symbols-rounded">signal_cellular_alt</span> Ping

@@ -1105,7 +1105,7 @@ body {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
     gap: 25px;
-    margin-bottom: 30px;
+    
 }
 
 .config-card {
@@ -2056,7 +2056,7 @@ input:checked + .slider:before {
     align-items: center;
     justify-content: center;
     font-weight: 600;
-    font-size: 14px;
+    font-size: 12px;
 }
 
 .port-protocol {
@@ -3455,7 +3455,7 @@ button.restart:hover {
 
 /* Input Section */
 .remote-check-section { margin-top:30px; display:flex; flex-direction:column; align-items:center; }
-.remote-input-card { background:#fff; border-radius:18px; padding:20px 30px; width:500px; box-shadow:0 10px 20px rgba(0,0,0,0.1); }
+.remote-input-card { background:#fff; border-radius:18px; padding:20px 30px; width:100%; box-shadow:0 10px 20px rgba(0,0,0,0.1); }
 .input-group { display:flex; gap:10px; flex-wrap:wrap; }
 .input-group input { flex:1; padding:10px; border:1px solid #d1d5db; border-radius:10px; font-size:1em; transition: all 0.2s; }
 .input-group input:focus { border-color:#7e22ce; box-shadow:0 0 0 3px rgba(126,34,206,0.15); outline:none; }
@@ -3727,7 +3727,7 @@ body {
     margin: 0 auto !important;
 }
 .config-card, .stats-card, .info-card, .results-card, .licence-container, .setup-box, .content-container {
-    max-width: 1400px !important;
+    // max-width: 1400px !important;
     width: 100% !important;
     margin-left: auto !important;
     margin-right: auto !important;
@@ -3886,7 +3886,6 @@ body {
     box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
 }
 .drop-box {
-    background: var(--primary-btn) !important;
     color: white !important;
     border-radius: 12px !important;
     display: flex !important;
@@ -3894,10 +3893,10 @@ body {
     align-items: center !important;
     justify-content: center !important;
     gap: 10px !important;
-    border: 2px dashed rgba(255,255,255,0.3) !important;
+    border: 2px dashed var(--primary-btn) !important;
 }
 .drop-box span, .drop-box p, .drop-box .status {
-    color: white !important;
+    color:var(--primary-btn) !important;
 }
 
 .action-btn {
@@ -4217,7 +4216,6 @@ input:checked + .slider {
 .stats-card, .users-card {
     background: var(--bg-card) !important;
     border: 1px solid var(--border-color) !important;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
 }
 
 /* Stats grid items */
