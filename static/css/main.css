@@ -1703,24 +1703,64 @@ body.split-login {
 }
 
 /* line 124, static/scss/pages/system.scss */
+.system-grid .info-grid {
+  display: flex;
+  flex-direction: column;
+}
+
+/* line 129, static/scss/pages/system.scss */
+.system-grid .info-item {
+  display: grid;
+  grid-template-columns: minmax(120px, 42%) 1fr;
+  gap: 10px;
+  align-items: start;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-color, #dee2e6);
+}
+
+/* line 137, static/scss/pages/system.scss */
+.system-grid .info-item:last-child {
+  border-bottom: none;
+}
+
+/* line 142, static/scss/pages/system.scss */
+.system-grid .info-label {
+  color: var(--text-muted, #6c757d);
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+/* line 149, static/scss/pages/system.scss */
+.system-grid .info-value {
+  color: var(--text-main, #212529);
+  font-weight: 700;
+  text-align: right;
+  line-height: 1.35;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* line 159, static/scss/pages/system.scss */
 .refresh-indicator {
   margin-left: auto;
 }
 
-/* line 128, static/scss/pages/system.scss */
+/* line 163, static/scss/pages/system.scss */
 .refresh-indicator .material-symbols-rounded {
   cursor: pointer;
   color: var(--text-muted, #6c757d);
   font-size: 20px;
 }
 
-/* line 134, static/scss/pages/system.scss */
+/* line 169, static/scss/pages/system.scss */
 .progress-container {
   width: 100%;
   margin-bottom: 12px;
 }
 
-/* line 138, static/scss/pages/system.scss */
+/* line 173, static/scss/pages/system.scss */
 .progress-container .progress-bar {
   background: var(--border-color, #dee2e6);
   height: 10px;
@@ -1728,7 +1768,7 @@ body.split-login {
   overflow: hidden;
 }
 
-/* line 146, static/scss/pages/system.scss */
+/* line 181, static/scss/pages/system.scss */
 .progress-fill {
   height: 100%;
   background: var(--primary-btn, #007bff);
@@ -1737,14 +1777,14 @@ body.split-login {
   width: var(--progress, 0%) !important;
 }
 
-/* line 154, static/scss/pages/system.scss */
+/* line 189, static/scss/pages/system.scss */
 .system-details {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 20px;
 }
 
-/* line 160, static/scss/pages/system.scss */
+/* line 195, static/scss/pages/system.scss */
 .detail-item {
   display: flex;
   justify-content: space-between;
@@ -1753,21 +1793,33 @@ body.split-login {
   border-bottom: 1px solid var(--border-color, #dee2e6);
 }
 
-/* line 167, static/scss/pages/system.scss */
+/* line 202, static/scss/pages/system.scss */
 .detail-item:last-child {
   border-bottom: none;
 }
 
-/* line 171, static/scss/pages/system.scss */
+/* line 206, static/scss/pages/system.scss */
 .detail-item .detail-label {
   font-weight: 500;
   color: var(--text-muted, #6c757d);
 }
 
-/* line 176, static/scss/pages/system.scss */
+/* line 211, static/scss/pages/system.scss */
 .detail-item .detail-value {
   color: var(--text-main, #212529);
   font-weight: 700;
+}
+
+@media (max-width: 640px) {
+  /* line 218, static/scss/pages/system.scss */
+  .system-grid .info-item {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  /* line 223, static/scss/pages/system.scss */
+  .system-grid .info-value {
+    text-align: left;
+  }
 }
 
 /* --- SCSS Variables --- */

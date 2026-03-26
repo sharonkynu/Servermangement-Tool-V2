@@ -386,7 +386,9 @@ def get_system_info():
 
         # CPU, Memory, Disk, etc.
         cpu_count = psutil.cpu_count()
-        cpu_freq = psutil.cpu_freq().current if psutil.cpu_freq() else 'N/A'
+        cpu_freq_info = psutil.cpu_freq()
+        cpu_freq = round(cpu_freq_info.current, 2) if cpu_freq_info and cpu_freq_info.current else 'N/A'
+        cpu_percent = round(psutil.cpu_percent(interval=0.4), 1)
         mem = psutil.virtual_memory()
         disk = psutil.disk_usage('/')
         boot_time_dt = datetime.datetime.fromtimestamp(psutil.boot_time())
@@ -402,7 +404,7 @@ def get_system_info():
             'gateway': gateway,
             'mac_address': primary_mac,
             'primary_interface': primary_iface,
-            'cpu_percent': psutil.cpu_percent(interval=1),
+            'cpu_percent': cpu_percent,
             'cpu_count': cpu_count,
             'cpu_freq': cpu_freq,
             'memory_percent': mem.percent,
