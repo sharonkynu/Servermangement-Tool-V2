@@ -1,0 +1,82 @@
+@import '../variables';
+
+.users-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.user-card {
+    background: $bg-card;
+    padding: $spacing-xxl;
+    border-radius: $radius-xxl;
+    border: 1px solid $border-color;
+    box-shadow: $card-shadow;
+    animation: fadeInUp 0.5s ease-out;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: $spacing-lg;
+
+        .avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: rgba($primary-btn, 0.1);
+            color: $primary-btn;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: $fs-20;
+            font-weight: 700;
+        }
+
+        .details {
+            display: flex;
+            flex-direction: column;
+
+            .username {
+                font-size: $fs-18;
+                font-weight: 700;
+                color: $text-main;
+            }
+
+            .role {
+                font-size: $fs-13;
+                color: $text-muted;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+        }
+    }
+
+    .user-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: $spacing-xs;
+
+        .btn-action {
+            background: transparent;
+            border: none;
+            padding: $spacing-xs;
+            border-radius: $radius-pill;
+            cursor: pointer;
+            transition: $transition-fast;
+            color: $text-muted;
+
+            &:hover {
+                background: rgba(0, 0, 0, 0.05);
+                color: $text-main;
+            }
+
+            &.delete:hover {
+                background: rgba($danger, 0.1);
+                color: $danger;
+            }
+        }
+    }
+}

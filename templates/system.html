@@ -3,9 +3,28 @@
 {% block title %}System Information - Server Management{% endblock %}
 
 {% block content %}
-<div class="page-header">
-    <h1>System Information</h1>
-    <p>Real-time system metrics and hardware details</p>
+<div class="page-head-container">
+    <div class="page-header">
+        <h1>System Information</h1>
+        <p>Real-time system metrics and hardware details</p>
+    </div>
+    
+    <div class="system-toolbar">
+        <div class="system-toolbar-right">
+            <span class="material-symbols-rounded refresh-clock-icon" aria-hidden="true">schedule</span>
+            <label for="auto-refresh-interval">Auto Refresh</label>
+            <select id="auto-refresh-interval" aria-label="Auto refresh interval">
+                <option value="0">Off</option>
+                <option value="10" selected>10s</option>
+                <option value="15">15s</option>
+                <option value="30">30s</option>
+                <option value="60">60s</option>
+                <option value="120">120s</option>
+            </select>
+            <span id="next-refresh-label" class="next-refresh-label">10s</span>
+        </div>
+    </div>
+   
 </div>
 
 <div class="system-grid">
@@ -60,7 +79,7 @@
         </div>
         <div class="progress-container">
             <div class="progress-bar">
-                <div class="progress-fill" id="cpu-progress" style="width: {{ system_info['cpu_percent'] }}%"></div>
+                <div class="progress-fill" id="cpu-progress" style="--progress: {{ system_info['cpu_percent'] }}%"></div>
             </div>
             <!-- <span class="progress-text" id="cpu-text">{{ system_info['cpu_percent'] }}%</span> -->
         </div>
@@ -95,7 +114,7 @@
             </div>
             <div class="progress-container">
                 <div class="progress-bar">
-                    <div class="progress-fill" id="memory-progress" style="width: {{ system_info.memory_percent }}%"></div>
+                    <div class="progress-fill" id="memory-progress" style="--progress: {{ system_info.memory_percent }}%"></div>
                 </div>
                 <!-- <span class="progress-text" id="memory-text">{{ system_info.memory_percent }}%</span> -->
             </div>
@@ -135,7 +154,7 @@
         <div class="disk-details">
             <div class="progress-container">
                 <div class="progress-bar">
-                    <div class="progress-fill" id="disk-progress-fill" style="width: {{ system_info.disk_percent }}%;"></div>
+                    <div class="progress-fill" id="disk-progress-fill" style="--progress: {{ system_info.disk_percent }}%;"></div>
                 </div>
             </div>
 
@@ -172,25 +191,23 @@
             <div class="info-item">
                 <span class="info-label">Interface Name</span>
                 <span class="info-value">
-                    {{ system_info.primary_interface }} 
-                    {% if system_info.ip != "N/A" %}
-                    <span class="interface-status active">Active</span>
-                    {% else %}
-                    <span class="interface-status inactive">Inactive</span>
-                    {% endif %}
+                    <span id="primary-interface">{{ system_info.primary_interface }}</span>
+                    <span class="interface-status {% if system_info.ip != 'N/A' %}active{% else %}inactive{% endif %}" id="interface-status">
+                        {% if system_info.ip != 'N/A' %}Active{% else %}Inactive{% endif %}
+                    </span>
                 </span>
             </div>
             <div class="info-item">
                 <span class="info-label">IP Address</span>
-                <span class="info-value">{{ system_info.ip }}</span>
+                <span class="info-value" id="network-ip">{{ system_info.ip }}</span>
             </div>
             <div class="info-item">
                 <span class="info-label">MAC Address</span>
-                <span class="info-value">{{ system_info.mac_address }}</span>
+                <span class="info-value" id="network-mac">{{ system_info.mac_address }}</span>
             </div>
             <div class="info-item">
                 <span class="info-label">Gateway Info</span>
-                <span class="info-value">{{ system_info.get('gateway', 'Unavailable') }}</span>
+                <span class="info-value" id="network-gateway">{{ system_info.get('gateway', 'Unavailable') }}</span>
             </div>
         </div>
     </div>
@@ -211,19 +228,19 @@
         <div class="info-grid">
             <div class="info-item">
                 <span class="info-label">Load Average (1m)</span>
-                <span class="info-value">{{ "%.2f"|format(system_info.load_avg[0]) }}</span>
+                <span class="info-value" id="load-avg-1m">{{ "%.2f"|format(system_info.load_avg[0]) }}</span>
             </div>
             <div class="info-item">
                 <span class="info-label">Running Processes</span>
-                <span class="info-value">{{ system_info.process_count }}</span>
+                <span class="info-value" id="process-count">{{ system_info.process_count }}</span>
             </div>
             <div class="info-item">
                 <span class="info-label">Disk Read Speed</span>
-                <span class="info-value">{{ system_info.read_speed }} KB/s</span>
+                <span class="info-value" id="disk-read-speed">{{ system_info.read_speed }} KB/s</span>
             </div>
             <div class="info-item">
                 <span class="info-label">Disk Write Speed</span>
-                <span class="info-value">{{ system_info.write_speed }} KB/s</span>
+                <span class="info-value" id="disk-write-speed">{{ system_info.write_speed }} KB/s</span>
             </div>
         </div>
     </div>
@@ -266,18 +283,155 @@
 
 {% block extra_js %}
 <script>
-function addRefreshAnimation(elementId) {
-    const el = document.getElementById(elementId);
-    if (!el) return;
-    el.classList.add('refresh-spin');
-    setTimeout(() => el.classList.remove('refresh-spin'), 1000);
-}
+document.addEventListener('DOMContentLoaded', () => {
+    function addRefreshAnimation(elementId) {
+        const el = document.getElementById(elementId);
+        if (!el) return;
+        el.classList.add('refresh-spin');
+        setTimeout(() => el.classList.remove('refresh-spin'), 1000);
+    }
 
-document.querySelectorAll('.refresh-indicator span').forEach(btn => {
-    btn.addEventListener('click', () => {
-        addRefreshAnimation(btn.id);
-        setTimeout(() => location.reload(), 600);
+    function setText(id, value, suffix = '') {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const raw = value === null || value === undefined || value === '' ? 'N/A' : value;
+        el.textContent = `${raw}${suffix}`;
+    }
+
+    function setProgress(id, value) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const numeric = Number(value);
+        el.style.setProperty('--progress', `${Number.isFinite(numeric) ? numeric : 0}%`);
+    }
+
+    function renderSystemInfo(data) {
+        setText('os-info', data.os_info);
+        setText('serial-number', data.serial_number);
+        setText('mac-address', data.mac_address);
+        setText('ip-address', data.ip);
+
+        setText('cpu-percent', data.cpu_percent, '%');
+        setText('cpu-count', data.cpu_count);
+        setText('cpu-freq', data.cpu_freq);
+        setProgress('cpu-progress', data.cpu_percent);
+
+        setText('memory-percent', data.memory_percent, '%');
+        setText('memory-total', data.memory_total, ' GB');
+        setText('memory-used', data.memory_used, ' GB');
+        const memTotal = Number(data.memory_total || 0);
+        const memUsed = Number(data.memory_used || 0);
+        const memAvailable = Math.max(0, memTotal - memUsed).toFixed(2);
+        setText('memory-available', memAvailable, ' GB');
+        setProgress('memory-progress', data.memory_percent);
+
+        setText('disk-percent', data.disk_percent, '%');
+        setText('disk-total', data.disk_total, ' GB');
+        setText('disk-used', data.disk_used, ' GB');
+        setText('disk-free', data.disk_free, ' GB');
+        setProgress('disk-progress-fill', data.disk_percent);
+
+        setText('primary-interface', data.primary_interface);
+        setText('network-ip', data.ip);
+        setText('network-mac', data.mac_address);
+        setText('network-gateway', data.gateway || 'Unavailable');
+
+        const ifaceStatus = document.getElementById('interface-status');
+        if (ifaceStatus) {
+            const isActive = data.ip && data.ip !== 'N/A';
+            ifaceStatus.textContent = isActive ? 'Active' : 'Inactive';
+            ifaceStatus.classList.toggle('active', isActive);
+            ifaceStatus.classList.toggle('inactive', !isActive);
+        }
+
+        const loadAvg = Array.isArray(data.load_avg) && data.load_avg.length ? Number(data.load_avg[0]).toFixed(2) : '0.00';
+        setText('load-avg-1m', loadAvg);
+        setText('process-count', data.process_count);
+        setText('disk-read-speed', data.read_speed, ' KB/s');
+        setText('disk-write-speed', data.write_speed, ' KB/s');
+
+        const uptimeHours = Math.max(0, Math.floor(Number(data.uptime || 0) / 3600));
+        setText('uptime-value', uptimeHours, 'h');
+        setText('boot-time', data.boot_time);
+        setText('current-time', data.current_time);
+    }
+
+    async function refreshSystemInfo() {
+        const res = await fetch('/api/system_info');
+        if (!res.ok) throw new Error('Failed to fetch system info');
+        const data = await res.json();
+        renderSystemInfo(data);
+    }
+
+    document.querySelectorAll('.refresh-indicator span').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+            addRefreshAnimation(btn.id);
+            try {
+                await refreshSystemInfo();
+            } catch (error) {
+                console.error(error);
+            }
+        });
     });
+
+    refreshSystemInfo().catch((error) => console.error(error));
+
+    let autoRefreshTimer = null;
+    let refreshCountdownTimer = null;
+    let countdownRemaining = 0;
+
+    const intervalSelect = document.getElementById('auto-refresh-interval');
+    const nextRefreshLabel = document.getElementById('next-refresh-label');
+
+    function clearAutoRefreshTimers() {
+        if (autoRefreshTimer) {
+            clearInterval(autoRefreshTimer);
+            autoRefreshTimer = null;
+        }
+        if (refreshCountdownTimer) {
+            clearInterval(refreshCountdownTimer);
+            refreshCountdownTimer = null;
+        }
+    }
+
+    function updateCountdownLabel() {
+        if (!nextRefreshLabel) return;
+        if (countdownRemaining <= 0) {
+            nextRefreshLabel.textContent = 'Now';
+            return;
+        }
+        nextRefreshLabel.textContent = `${countdownRemaining}s`;
+    }
+
+    function startAutoRefresh(intervalSeconds) {
+        clearAutoRefreshTimers();
+
+        if (!intervalSeconds || intervalSeconds < 10) {
+            if (nextRefreshLabel) nextRefreshLabel.textContent = 'Off';
+            return;
+        }
+
+        countdownRemaining = intervalSeconds;
+        updateCountdownLabel();
+
+        refreshCountdownTimer = setInterval(() => {
+            countdownRemaining -= 1;
+            if (countdownRemaining < 0) countdownRemaining = intervalSeconds;
+            updateCountdownLabel();
+        }, 1000);
+
+        autoRefreshTimer = setInterval(() => {
+            refreshSystemInfo().catch((error) => console.error(error));
+        }, intervalSeconds * 1000);
+    }
+
+    if (intervalSelect) {
+        intervalSelect.addEventListener('change', (event) => {
+            const selectedInterval = Number(event.target.value || 0);
+            startAutoRefresh(selectedInterval);
+        });
+        startAutoRefresh(Number(intervalSelect.value || 0));
+    }
 });
 </script>
 {% endblock %}

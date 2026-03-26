@@ -1,0 +1,34 @@
+@import 'variables';
+@import 'utilities';
+
+/* Base Layout & Layout Components */
+@import 'pages/base';
+
+/* Page Specific Styles */
+/* Page partials (use consistent filename conventions) */
+@import 'pages/login';
+@import 'pages/network';
+@import 'pages/ports';
+@import 'pages/port-config';
+@import 'pages/ssl';
+@import 'pages/system';
+@import 'pages/users';
+@import 'pages/dns';
+@import 'pages/licence';
+@import 'pages/remote-check';
+
+/* Legacy Compatibility Layer (Minimized) */
+@import 'smv2-legacy-ui-and-theme';
+
+/* Additional Global Fixes */
+.progress-fill {
+    width: var(--progress, 0%) !important;
+}
+
+/* Global shadow suppression (project-wide) */
+*,
+*::before,
+*::after {
+    box-shadow: none !important;
+    text-shadow: none !important;
+}

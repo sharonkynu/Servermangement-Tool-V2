@@ -5,6 +5,8 @@ import subprocess
 import socket
 import psutil
 import hashlib
+import ipaddress
+import shutil
 from datetime import datetime
 import threading
 import ping3
@@ -29,7 +31,17 @@ app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 # Configuration
 USERS_FILE = os.environ.get('USERS_FILE', 'users.json')
 DOCKER_COMPOSE_FILE = os.environ.get('DOCKER_COMPOSE_FILE', 'docker-compose.yml')
-COMPOSE_BASE_DIR = os.environ.get('COMPOSE_BASE_DIR', '/home/sharon/Pictures/ServerManagement/tst')
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+DEFAULT_DOCKER_DIR = os.path.join(PROJECT_ROOT, 'docker')
+
+def _clean_env_path(value, fallback):
+    raw = (value or fallback or '').strip()
+    return raw.strip('"').strip("'")
+
+COMPOSE_BASE_DIR = _clean_env_path(
+    os.environ.get('COMPOSE_BASE_DIR'),
+    DEFAULT_DOCKER_DIR
+)
 HOST = os.environ.get('HOST', '0.0.0.0')
 PORT = int(os.environ.get('PORT', 8085))
 
@@ -37,18 +49,18 @@ CERT_PATH = os.environ.get('CERT_PATH', '/var/www/ssl/tst/tst.cert')
 KEY_PATH = os.environ.get('KEY_PATH', '/var/www/ssl/tst/tst.key')
 
 
-MANAGEMENT_DOCKER_PATH = os.getenv("MANAGEMENT_DOCKER_PATH", "/home/sharon/Pictures/ServerManagement/docker/management/")
-MCU_DOCKER_PATH = os.getenv("MCU_DOCKER_PATH", "/ohome/sharon/Pictures/ServerManagement/docker/mcu")
+MANAGEMENT_DOCKER_PATH = _clean_env_path(
+    os.getenv("MANAGEMENT_DOCKER_PATH"),
+    os.path.join(DEFAULT_DOCKER_DIR, 'management')
+)
+MCU_DOCKER_PATH = _clean_env_path(
+    os.getenv("MCU_DOCKER_PATH"),
+    os.path.join(DEFAULT_DOCKER_DIR, 'mcu')
+)
 
 # Encrypted keys (from env)
 MANAGEMENT_KEY = os.getenv("MANAGEMENT_KEY", "Not set")
 MCU_KEY = os.getenv("MCU_KEY", "Not set")
-
-# Define your Docker Compose directories
-#Licence paths env's
-
-MANAGEMENT_DOCKER_PATH = "/home/sharon/Pictures/ServerManagement/docker/management"
-MCU_DOCKER_PATH = "/home/sharon/Pictures/ServerManagement/docker/mcu"
 
 def load_users():
     try:
@@ -314,7 +326,7 @@ def get_system_info():
                             return iface, ip_used, mac
                 return "N/A", ip_used, "N/A"
             except Exception:
-                return "N/A", "127.0.0.1", "N/A"
+                return "N/A", "N/A", "N/A"
 
         # Get actual route-based active interface
         primary_iface, primary_ip, primary_mac = get_real_active_interface()
@@ -477,123 +489,125 @@ def get_network_info():
     except Exception as e:
         return {'error': str(e)}
 
-def update_docker_compose_env(key, value):
-    """Update environment variable across docker compose files under COMPOSE_BASE_DIR."""
-    try:
-        updated_any = False
-        if not os.path.isdir(COMPOSE_BASE_DIR):
-            return False
+def _resolve_compose_file(path_hint):
+    """Return compose file path from either a directory or a file hint."""
+    if not path_hint:
+        return None
+    p = _clean_env_path(path_hint, '')
+    if os.path.isfile(p):
+        return p
+    if os.path.isdir(p):
+        for fname in ('docker-compose.yml', 'docker-compose.yaml', 'compose.yml', 'compose.yaml'):
+            candidate = os.path.join(p, fname)
+            if os.path.isfile(candidate):
+                return candidate
+    return None
+
+def _collect_compose_files():
+    """Collect compose files from COMPOSE_BASE_DIR and explicit management/mcu paths."""
+    files = []
+
+    # Handle COMPOSE_BASE_DIR as either compose file path or directory of projects.
+    base_file = _resolve_compose_file(COMPOSE_BASE_DIR)
+    if base_file:
+        files.append(base_file)
+    elif os.path.isdir(COMPOSE_BASE_DIR):
         for entry in os.listdir(COMPOSE_BASE_DIR):
             entry_path = os.path.join(COMPOSE_BASE_DIR, entry)
-            if not os.path.isdir(entry_path):
-                continue
-            for fname in ('docker-compose.yml', 'docker-compose.yaml', 'compose.yml', 'compose.yaml'):
-                compose_path = os.path.join(entry_path, fname)
-                if not os.path.exists(compose_path):
-                    continue
-                try:
-                    with open(compose_path, 'r') as f:
-                        lines = f.readlines()
-                    # Update or insert under first environment section encountered
-                    updated = False
-                    env_index = None
-                    for i, line in enumerate(lines):
-                        if f"- {key}=" in line:
-                            lines[i] = f"      - {key}={value}\n"
-                            updated = True
-                            break
-                        if env_index is None and line.strip().startswith('environment:'):
-                            env_index = i
-                    if not updated and env_index is not None:
-                        lines.insert(env_index + 1, f"      - {key}={value}\n")
-                        updated = True
-                    if updated:
-                        with open(compose_path, 'w') as f:
-                            f.writelines(lines)
-                        updated_any = True
-                except Exception as inner_e:
-                    print(f"Error updating {compose_path}: {inner_e}")
-        return updated_any
-    except Exception as e:
-        print(f"Error updating docker compose files: {e}")
-        return False
+            if os.path.isdir(entry_path):
+                candidate = _resolve_compose_file(entry_path)
+                if candidate:
+                    files.append(candidate)
+
+    # Add explicit paths too (deduplicated later).
+    for hint in (MANAGEMENT_DOCKER_PATH, MCU_DOCKER_PATH):
+        candidate = _resolve_compose_file(hint)
+        if candidate:
+            files.append(candidate)
+
+    # Dedupe while preserving order.
+    seen = set()
+    result = []
+    for f in files:
+        if f not in seen:
+            seen.add(f)
+            result.append(f)
+    return result
 
 def update_docker_compose_env(key, value):
-    """Update environment variable across docker compose files under COMPOSE_BASE_DIR."""
-    updated_any = False
-    if not os.path.isdir(COMPOSE_BASE_DIR):
+    """Update an env var in all discovered compose files."""
+    compose_files = _collect_compose_files()
+    if not compose_files:
         return False
-    for entry in os.listdir(COMPOSE_BASE_DIR):
-        entry_path = os.path.join(COMPOSE_BASE_DIR, entry)
-        if not os.path.isdir(entry_path):
-            continue
-        for fname in ('docker-compose.yml', 'docker-compose.yaml', 'compose.yml', 'compose.yaml'):
-            compose_path = os.path.join(entry_path, fname)
-            if not os.path.exists(compose_path):
-                continue
-            try:
-                with open(compose_path, 'r') as f:
-                    lines = f.readlines()
 
-                updated = False
-                env_index = None
-                for i, line in enumerate(lines):
-                    if f"- {key}=" in line:
-                        lines[i] = f"      - {key}={value}\n"
-                        updated = True
-                        break
-                    if env_index is None and line.strip().startswith('environment:'):
-                        env_index = i
-                if not updated and env_index is not None:
-                    lines.insert(env_index + 1, f"      - {key}={value}\n")
+    updated_any = False
+    for compose_path in compose_files:
+        try:
+            with open(compose_path, 'r') as f:
+                lines = f.readlines()
+
+            updated = False
+            env_index = None
+            env_indent = "      "
+
+            for i, line in enumerate(lines):
+                stripped = line.strip()
+                if stripped.startswith(f"- {key}="):
+                    leading = line[:len(line) - len(line.lstrip())]
+                    lines[i] = f"{leading}- {key}={value}\n"
                     updated = True
-                if updated:
-                    with open(compose_path, 'w') as f:
-                        f.writelines(lines)
-                    updated_any = True
-            except Exception as inner_e:
-                print(f"Error updating {compose_path}: {inner_e}")
+                    break
+                if env_index is None and stripped.startswith('environment:'):
+                    env_index = i
+                    env_indent = line[:len(line) - len(line.lstrip())] + "  "
+
+            if not updated and env_index is not None:
+                lines.insert(env_index + 1, f"{env_indent}- {key}={value}\n")
+                updated = True
+
+            if updated:
+                with open(compose_path, 'w') as f:
+                    f.writelines(lines)
+                updated_any = True
+        except Exception as inner_e:
+            print(f"Error updating {compose_path}: {inner_e}")
+
     return updated_any
-
-
 
 def restart_docker_container(service=None):
     """
-    Restart containers in all compose projects under COMPOSE_BASE_DIR.
-    If 'service' is provided, only that service is restarted.
+    Restart containers in discovered compose files.
+    If requested service is not present in a compose file, restart whole project.
     """
-    if not os.path.isdir(COMPOSE_BASE_DIR):
-        cmd = ['docker-compose', 'restart']
-        if service:
-            cmd.append(service)
-        subprocess.run(cmd, check=True)
-        return True
+    compose_files = _collect_compose_files()
+    if not compose_files:
+        return False
 
     success = True
-    for entry in os.listdir(COMPOSE_BASE_DIR):
-        entry_path = os.path.join(COMPOSE_BASE_DIR, entry)
-        if not os.path.isdir(entry_path):
-            continue
+    for compose_file in compose_files:
+        cwd = os.path.dirname(compose_file)
+        try:
+            if service:
+                svc_check = subprocess.run(
+                    ['docker', 'compose', '-f', compose_file, 'config', '--services'],
+                    capture_output=True, text=True, cwd=cwd, check=False
+                )
+                services = set((svc_check.stdout or '').split())
 
-        compose_file = None
-        for fname in ('docker-compose.yml', 'docker-compose.yaml', 'compose.yml', 'compose.yaml'):
-            possible = os.path.join(entry_path, fname)
-            if os.path.exists(possible):
-                compose_file = possible
-                break
-
-        if compose_file:
-            try:
-                if service:
+                if service in services:
                     cmd = ['docker', 'compose', '-f', compose_file, 'restart', service]
                 else:
+                    # Service alias doesn't exist in this compose; restart project safely.
                     cmd = ['docker', 'compose', '-f', compose_file, 'restart']
-                subprocess.run(cmd, check=True)
-            except subprocess.CalledProcessError as e:
-                print(f"Error restarting compose at {compose_file}: {e}")
-                success = False
+            else:
+                cmd = ['docker', 'compose', '-f', compose_file, 'restart']
 
-    return success  # ✅ ensures we always return True or False
+            subprocess.run(cmd, check=True, cwd=cwd)
+        except subprocess.CalledProcessError as e:
+            print(f"Error restarting compose at {compose_file}: {e}")
+            success = False
+
+    return success
 
 
 
@@ -624,15 +638,100 @@ def api_network_config():
                 'timestamp': datetime.now().isoformat()
             }, f, indent=2)
 
-        # Safe mode: log only, do not apply actual network change
-        # For real-world use: system('nmcli', 'netplan', or 'ifconfig' here)
+        mode = (config.get('mode') or 'manual').strip().lower()
+        ip_address = (config.get('ip_address') or '').strip()
+        netmask = (config.get('netmask') or '').strip()
+        gateway = (config.get('gateway') or '').strip()
+
+        if shutil.which('nmcli') is None:
+            return jsonify({
+                'status': 'error',
+                'message': 'Network apply failed: nmcli is not available on this system.'
+            }), 400
+
+        # Determine active interface from current system info.
+        system_info = get_system_info()
+        iface = (system_info.get('primary_interface') or '').strip()
+        if not iface or iface == 'N/A':
+            return jsonify({
+                'status': 'error',
+                'message': 'Network apply failed: could not determine active network interface.'
+            }), 400
+
+        # Find active connection profile bound to this interface.
+        con_name = None
+        con_cmd = subprocess.run(
+            ['nmcli', '-t', '-f', 'NAME,DEVICE', 'connection', 'show', '--active'],
+            capture_output=True, text=True, check=False
+        )
+        for line in (con_cmd.stdout or '').splitlines():
+            if ':' not in line:
+                continue
+            name, device = line.split(':', 1)
+            if device.strip() == iface:
+                con_name = name.strip()
+                break
+
+        if not con_name:
+            con_name = iface
+
+        def run_nmcli(args):
+            result = subprocess.run(
+                ['sudo', '-n', 'nmcli'] + args,
+                capture_output=True,
+                text=True,
+                check=False
+            )
+            if result.returncode != 0:
+                stderr = (result.stderr or '').strip()
+                stdout = (result.stdout or '').strip()
+                detail = stderr or stdout or 'Unknown nmcli error'
+                raise RuntimeError(detail)
+
+        if mode == 'manual':
+            if not ip_address or not netmask or not gateway:
+                return jsonify({
+                    'status': 'error',
+                    'message': 'Manual mode requires IP address, netmask, and gateway.'
+                }), 400
+
+            try:
+                ipaddress.IPv4Address(ip_address)
+                ipaddress.IPv4Address(gateway)
+                prefix_len = ipaddress.IPv4Network(f"0.0.0.0/{netmask}").prefixlen
+            except Exception:
+                return jsonify({
+                    'status': 'error',
+                    'message': 'Invalid network input. Please enter valid IPv4 IP, netmask, and gateway.'
+                }), 400
+
+            cidr = f'{ip_address}/{prefix_len}'
+            run_nmcli(['connection', 'modify', con_name, 'ipv4.method', 'manual'])
+            run_nmcli(['connection', 'modify', con_name, 'ipv4.addresses', cidr])
+            run_nmcli(['connection', 'modify', con_name, 'ipv4.gateway', gateway])
+            run_nmcli(['connection', 'up', con_name])
+
+        elif mode == 'dhcp':
+            run_nmcli(['connection', 'modify', con_name, 'ipv4.method', 'auto'])
+            run_nmcli(['connection', 'modify', con_name, '-ipv4.addresses'])
+            run_nmcli(['connection', 'modify', con_name, '-ipv4.gateway'])
+            run_nmcli(['connection', 'up', con_name])
+
+        elif mode == 'disable':
+            run_nmcli(['device', 'disconnect', iface])
+        else:
+            return jsonify({'status': 'error', 'message': f'Unsupported network mode: {mode}'}), 400
+
         return jsonify({
             'status': 'success',
-            'message': 'Network configuration saved (not applied)',
+            'message': f'Network configuration applied successfully in {mode} mode on {iface}.',
             'dns_status': 'pending'
         })
     except Exception as e:
-        return jsonify({'status': 'error', 'message': str(e)})
+        err = str(e)
+        if 'sudo' in err.lower() or 'a password is required' in err.lower():
+            err = 'Permission denied. Please allow passwordless sudo for required network commands.'
+        return jsonify({'status': 'error', 'message': f'Network apply failed: {err}'})
 
 
 """"
@@ -688,6 +787,12 @@ def api_dns_config():
 
         # --- Apply based on DNS mode ---
         if dns_mode == 'manual':
+            if not name_server and not secondary_name_server:
+                return jsonify({
+                    'status': 'error',
+                    'message': 'Manual DNS mode requires at least one DNS server.'
+                }), 400
+
             resolv_content = ""
             if domain_suffix:
                 resolv_content += f"domain {domain_suffix}\n"
@@ -723,7 +828,10 @@ def api_dns_config():
             'dns_status': dns_mode
         })
     except Exception as e:
-        return jsonify({'status': 'error', 'message': str(e)})
+        err = str(e)
+        if 'sudo' in err.lower() or 'a password is required' in err.lower():
+            err = 'Permission denied. Please allow passwordless sudo for DNS and hostname commands.'
+        return jsonify({'status': 'error', 'message': f'DNS apply failed: {err}'})
     
 
 
@@ -869,19 +977,34 @@ def api_ports_config():
         update_docker_compose_env('PUBLIC_IP', public_ip)
 
         restart_results = []
+        restarted_names = []
 
-        # 🟩 Restart only what’s enabled
-        if h323_enabled and sip_enabled:
+        # Restart only enabled protocol stacks (best-effort per compose project).
+        if h323_enabled:
             restart_results.append(restart_docker_container('h323'))
+            restarted_names.append('H323')
+        if sip_enabled:
             restart_results.append(restart_docker_container('sip'))
-        elif h323_enabled:
-            restart_results.append(restart_docker_container('h323'))
-        elif sip_enabled:
-            restart_results.append(restart_docker_container('sip'))
+            restarted_names.append('SIP')
 
-        if restart_results and all(restart_results):
-            restarted_names = ', '.join([name for name, ok in zip(['H323', 'SIP'], restart_results) if ok])
-            message = f'Configuration applied successfully. Restarted: {restarted_names or "No services"}'
+        # If nothing is enabled, env update is still a valid success.
+        if not restart_results:
+            message = 'Configuration applied successfully. No enabled services to restart.'
+            return jsonify({
+                'status': 'success',
+                'message': message,
+                'current_state': {
+                    'h323_enabled': h323_enabled,
+                    'sip_enabled': sip_enabled,
+                    'h323_port': h323_port,
+                    'sip_port': sip_port,
+                    'private_ip': private_ip,
+                    'public_ip': public_ip
+                }
+            })
+
+        if all(restart_results):
+            message = f'Configuration applied successfully. Restarted: {", ".join(restarted_names)}'
             return jsonify({
                 'status': 'success',
                 'message': message,
@@ -912,28 +1035,22 @@ def api_ports_config_state():
         'public_ip': ''
     }
     try:
-        for entry in os.listdir(COMPOSE_BASE_DIR):
-            entry_path = os.path.join(COMPOSE_BASE_DIR, entry)
-            if not os.path.isdir(entry_path):
-                continue
-            for fname in ('docker-compose.yml', 'docker-compose.yaml', 'compose.yml', 'compose.yaml'):
-                compose_path = os.path.join(entry_path, fname)
-                if os.path.exists(compose_path):
-                    with open(compose_path, 'r') as f:
-                        for line in f:
-                            line = line.strip()
-                            if line.startswith('- H323_ENABLED='):
-                                state['h323_enabled'] = line.split('=')[1].lower() == 'true'
-                            elif line.startswith('- SIP_ENABLED='):
-                                state['sip_enabled'] = line.split('=')[1].lower() == 'true'
-                            elif line.startswith('- H323_PORT='):
-                                state['h323_port'] = line.split('=')[1]
-                            elif line.startswith('- SIP_PORT='):
-                                state['sip_port'] = line.split('=')[1]
-                            elif line.startswith('- PRIVATE_IP='):
-                                state['private_ip'] = line.split('=')[1]
-                            elif line.startswith('- PUBLIC_IP='):
-                                state['public_ip'] = line.split('=')[1]
+        for compose_path in _collect_compose_files():
+            with open(compose_path, 'r') as f:
+                for line in f:
+                    line = line.strip()
+                    if line.startswith('- H323_ENABLED='):
+                        state['h323_enabled'] = line.split('=', 1)[1].lower() == 'true'
+                    elif line.startswith('- SIP_ENABLED='):
+                        state['sip_enabled'] = line.split('=', 1)[1].lower() == 'true'
+                    elif line.startswith('- H323_PORT='):
+                        state['h323_port'] = line.split('=', 1)[1]
+                    elif line.startswith('- SIP_PORT='):
+                        state['sip_port'] = line.split('=', 1)[1]
+                    elif line.startswith('- PRIVATE_IP='):
+                        state['private_ip'] = line.split('=', 1)[1]
+                    elif line.startswith('- PUBLIC_IP='):
+                        state['public_ip'] = line.split('=', 1)[1]
         return jsonify({'status': 'success', 'current_state': state})
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)})
@@ -1092,7 +1209,7 @@ def api_ssl_upload():
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)})
 
-"""
+
 @app.route('/api/nginx_restart', methods=['POST'])
 def api_nginx_restart():
     if 'user' not in session:
@@ -1102,8 +1219,8 @@ def api_nginx_restart():
         return jsonify({'status': 'success', 'message': 'Nginx Restarted successfully'})
     except subprocess.CalledProcessError:
         return jsonify({'status': 'error', 'message': 'Restart failed'})
-"""
 
+"""
 @app.route('/api/nginx_restart', methods=['POST'])
 def api_nginx_restart():
     if 'user' not in session:
@@ -1134,7 +1251,7 @@ def api_nginx_restart():
         return jsonify({'error': 'SSH not installed in container'}), 500
     except subprocess.CalledProcessError as e:
         return jsonify({'status': 'error', 'message': e.stderr.decode() or f'Failed to restart Nginx on {host}'})
-
+"""
 
 @app.route('/api/check_port_status', methods=['GET'])
 def api_check_port_status():
@@ -1368,8 +1485,8 @@ import traceback
 def licence_get():
     try:
         def read_key(compose_path, key_name):
-            yml_path = os.path.join(compose_path, "docker-compose.yml")
-            if not os.path.exists(yml_path):
+            yml_path = _resolve_compose_file(compose_path)
+            if not yml_path or not os.path.exists(yml_path):
                 return None
 
             with open(yml_path, "r") as f:
@@ -1422,8 +1539,8 @@ def licence_update():
         else:
             return jsonify({"status": "error", "message": "Invalid target"}), 400
 
-        yml_path = os.path.join(compose_path, "docker-compose.yml")
-        if not os.path.exists(yml_path):
+        yml_path = _resolve_compose_file(compose_path)
+        if not yml_path or not os.path.exists(yml_path):
             return jsonify({"status": "error", "message": f"Missing {yml_path}"}), 400
 
         with open(yml_path, "r") as f:
@@ -1473,10 +1590,21 @@ def restart_docker_compose():
         return jsonify({"status": "error", "message": "Invalid target"}), 400
 
     try:
-        subprocess.run(["docker-compose", "-f", "docker-compose.yml", "down", "--remove-orphans"],
-                       check=True, cwd=compose_path)
-        subprocess.run(["docker-compose", "-f", "docker-compose.yml", "up", "-d", "--force-recreate"],
-                       check=True, cwd=compose_path)
+        compose_file = _resolve_compose_file(compose_path)
+        if not compose_file:
+            return jsonify({"status": "error", "message": f"Missing compose file in {compose_path}"}), 400
+
+        cwd = os.path.dirname(compose_file)
+        subprocess.run(
+            ["docker", "compose", "-f", compose_file, "down", "--remove-orphans"],
+            check=True,
+            cwd=cwd
+        )
+        subprocess.run(
+            ["docker", "compose", "-f", compose_file, "up", "-d", "--force-recreate"],
+            check=True,
+            cwd=cwd
+        )
         return jsonify({"status": "success", "message": f"{target.capitalize()} restarted successfully"})
 
     except subprocess.CalledProcessError as e:

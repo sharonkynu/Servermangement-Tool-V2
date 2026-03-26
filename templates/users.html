@@ -84,7 +84,7 @@
     </div>
 
     <!-- Add/Edit User Drawer Popup -->
-    <div id="user-form-overlay" class="drawer-overlay" style="display:none;"></div>
+    <div id="user-form-overlay" class="drawer-overlay d-none"></div>
     <div class="user-form-drawer" id="user-form-card">
         <div class="drawer-header">
             <div class="card-icon">
@@ -265,7 +265,7 @@
             document.getElementById('submit-text').textContent = 'Create User';
             document.getElementById('edit-username').value = '';
             form.reset();
-            document.getElementById('user-form-overlay').style.display = 'block';
+            document.getElementById('user-form-overlay').classList.remove('d-none');
             document.getElementById('user-form-card').classList.add('open');
             setTimeout(() => {
                 document.getElementById('user-form-card').focus();
@@ -273,7 +273,7 @@
         }
 
         function hideUserForm() {
-            document.getElementById('user-form-overlay').style.display = 'none';
+            document.getElementById('user-form-overlay').classList.add('d-none');
             document.getElementById('user-form-card').classList.remove('open');
             const usernameInput = document.getElementById('username');
             if (usernameInput) usernameInput.readOnly = false;
@@ -344,7 +344,7 @@
             deleteUsername = username;
             const el = document.getElementById('delete-username');
             if (el) el.textContent = username;
-            document.getElementById('delete-modal').style.display = 'block';
+            document.getElementById('delete-modal').classList.add('d-block');
         }
 
         function confirmDelete() {
@@ -367,7 +367,7 @@
         }
 
         function closeDeleteModal() {
-            document.getElementById('delete-modal').style.display = 'none';
+            document.getElementById('delete-modal').classList.remove('d-block');
             deleteUsername = '';
         }
 

@@ -11,145 +11,255 @@
 <div class="remote-check-section">
   <!-- Input Area -->
   <div class="remote-input-card">
-    <div class="input-group">
-      <input type="text" id="single-target" placeholder="Enter IP address or hostname">
-      <input type="text" id="single-port" placeholder="Port (for Telnet)" min="1" max="65535">
-      <div class="action-btn-container">
-        <button class="btn btn-purple" id="btn-ping"><span class="material-symbols-rounded">signal_cellular_alt</span> Ping</button>
-        <button class="btn btn-yellow" id="btn-telnet"><span class="material-symbols-rounded">power</span> Telnet</button>
-        <button class="btn btn-blue" id="btn-traceroute"><span class="material-symbols-rounded">route</span> Traceroute</button>
-      </div>
-      
+    <div class="remote-input-header">
+      <h3>Run Connectivity Tests</h3>
+      <p>Provide a valid host/IP and port, then run Ping, Telnet, or Traceroute.</p>
     </div>
+    <div class="input-group">
+      <div class="input-field target-field">
+        <label for="single-target">IP Address or Hostname</label>
+        <input type="text" id="single-target" placeholder="e.g. 8.8.8.8 or example.com" autocomplete="off">
+      </div>
+      <div class="input-field port-field">
+        <label for="single-port">Port (Telnet)</label>
+        <input type="number" id="single-port" placeholder="1-65535" min="1" max="65535" step="1">
+      </div>
+      <div class="action-btn-container">
+        <button class="btn btn-purple" id="btn-ping">
+          <span class="material-symbols-rounded">signal_cellular_alt</span> Ping
+        </button>
+        <button class="btn btn-yellow" id="btn-telnet">
+          <span class="material-symbols-rounded">power</span> Telnet
+        </button>
+        <button class="btn btn-blue" id="btn-traceroute">
+          <span class="material-symbols-rounded">route</span> Traceroute
+        </button>
+      </div>
+    </div>
+    <div id="remote-validation-message" class="validation-message d-none"></div>
   </div>
 
-  <!-- Results Grid (Columns) -->
+  <!-- Results Grid -->
   <div class="results-grid">
-    <!-- Ping -->
-    <div class="results-card">
+    <!-- Ping Card -->
+    <div class="results-card" id="card-ping">
       <div class="card-header">
         <div class="card-icon"><span class="material-symbols-rounded">show_chart</span></div>
-        <h3>Ping</h3>
+        <h3>Ping Result</h3>
+        <span class="result-chip">ICMP</span>
       </div>
       <div class="card-content">
         <div class="stats">
-          <div><b>Target:</b> <span id="ping-target-display">-</span></div>
-          <div><b>Status:</b> <span id="ping-status">-</span></div>
+          <div><b>Target:</b> <span id="ping-target-display" class="v-align-middle">-</span></div>
+          <div><b>Status:</b> <span id="ping-status" class="v-align-middle">-</span></div>
         </div>
-        <div class="output-box" id="ping-output">
-          <div class="output-placeholder">
+        <div id="ping-output-container">
+          <div class="output-placeholder" id="ping-placeholder">
             <span class="material-symbols-rounded">info</span>
             <p>Enter a target and click Ping</p>
           </div>
+          <pre class="output-box d-none" id="ping-output"></pre>
         </div>
       </div>
     </div>
 
-    <!-- Telnet -->
-    <div class="results-card">
+    <!-- Telnet Card -->
+    <div class="results-card" id="card-telnet">
       <div class="card-header">
         <div class="card-icon"><span class="material-symbols-rounded">terminal</span></div>
-        <h3>Telnet</h3>
+        <h3>Telnet Result</h3>
+        <span class="result-chip">TCP</span>
       </div>
       <div class="card-content">
         <div class="stats">
-          <div><b>Target:</b> <span id="telnet-target-display">-</span></div>
-          <!-- <div><b>Port:</b> <span id="telnet-port-display">-</span></div> -->
-          <div><b>Status:</b> <span id="telnet-status">-</span></div>
+          <div><b>Target:</b> <span id="telnet-target-display" class="v-align-middle">-</span></div>
+          <div><b>Status:</b> <span id="telnet-status" class="v-align-middle">-</span></div>
         </div>
-        <div class="output-box" id="telnet-output">
-          <div class="output-placeholder">
+        <div id="telnet-output-container">
+          <div class="output-placeholder" id="telnet-placeholder">
             <span class="material-symbols-rounded">info</span>
-            <p>Enter a target& port</p>
+            <p>Enter a target & port and click Telnet</p>
           </div>
+          <pre class="output-box d-none" id="telnet-output"></pre>
         </div>
       </div>
     </div>
 
-    <!-- Traceroute -->
-    <div class="results-card">
+    <!-- Traceroute Card -->
+    <div class="results-card" id="card-traceroute">
       <div class="card-header">
         <div class="card-icon"><span class="material-symbols-rounded">route</span></div>
-        <h3>Traceroute</h3>
+        <h3>Traceroute Result</h3>
+        <span class="result-chip">HOPS</span>
       </div>
       <div class="card-content">
         <div class="stats">
-          <div><b>Target:</b> <span id="traceroute-target-display">-</span></div>
-          <div><b>Status:</b> <span id="traceroute-status">-</span></div>
+          <div><b>Target:</b> <span id="traceroute-target-display" class="v-align-middle">-</span></div>
+          <div><b>Status:</b> <span id="traceroute-status" class="v-align-middle">-</span></div>
         </div>
-        <div class="output-box" id="traceroute-output">
-          <div class="output-placeholder">
+        <div id="traceroute-output-container">
+          <div class="output-placeholder" id="traceroute-placeholder">
             <span class="material-symbols-rounded">info</span>
-        <pre class="output-box" id="traceroute-output">Enter a target and click Traceroute</pre>
+            <p>Enter a target and click Traceroute</p>
+          </div>
+          <pre class="output-box d-none" id="traceroute-output"></pre>
+        </div>
       </div>
     </div>
   </div>
 </div>
 {% endblock %}
 
-
-
-
 {% block extra_js %}
 <script>
 document.addEventListener("DOMContentLoaded", function() {
+    function isValidTarget(target) {
+        const ipRegex = /^(?:(?:25[0-5]|2[0-4]\d|1?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|1?\d?\d)$/;
+        const hostRegex = /^(?=.{1,253}$)(?!-)(?:[a-zA-Z0-9-]{1,63}\.)*[a-zA-Z0-9-]{1,63}$/;
+        return ipRegex.test(target) || hostRegex.test(target);
+    }
+
+    function isValidPort(port) {
+        const numericPort = Number(port);
+        return Number.isInteger(numericPort) && numericPort >= 1 && numericPort <= 65535;
+    }
+
+    function showValidationMessage(message) {
+        const validationEl = document.getElementById("remote-validation-message");
+        if (!validationEl) return;
+        validationEl.textContent = message;
+        validationEl.classList.remove("d-none");
+    }
+
+    function clearValidationMessage() {
+        const validationEl = document.getElementById("remote-validation-message");
+        if (!validationEl) return;
+        validationEl.textContent = "";
+        validationEl.classList.add("d-none");
+    }
 
     async function remoteCheck(type) {
-        const target = document.getElementById("single-target").value.trim();
-        const port = document.getElementById("single-port").value || 80;
-        if(!target) return alert("Enter target");
+        const targetInput = document.getElementById("single-target");
+        const portInput = document.getElementById("single-port");
+        const target = targetInput.value.trim();
+        const portRaw = portInput ? portInput.value.trim() : '';
+        const port = portRaw ? Number(portRaw) : null;
 
-        // Show target immediately
-        if(type==="ping") document.getElementById("ping-target-display").innerText = target;
-        if(type==="telnet") document.getElementById("telnet-target-display").innerText = target;
-        if(type==="traceroute") document.getElementById("traceroute-target-display").innerText = target;
+        clearValidationMessage();
+        targetInput.classList.remove("error-border");
+        portInput.classList.remove("error-border");
 
-        // Show loading
-        if(type==="ping") { 
-            document.getElementById("ping-status").innerText="Checking...";
-            document.getElementById("ping-output").innerText="";
+        if(!target) {
+            targetInput.classList.add("error-border");
+            showValidationMessage("Please enter a target IP address or hostname.");
+            setTimeout(() => targetInput.classList.remove("error-border"), 1000);
+            return;
         }
-        if(type==="telnet") {
-            document.getElementById("telnet-status").innerText="Checking...";
-            document.getElementById("telnet-output").innerText="";
+
+        if (!isValidTarget(target)) {
+            targetInput.classList.add("error-border");
+            showValidationMessage("Target format looks invalid. Use a valid IP or hostname.");
+            setTimeout(() => targetInput.classList.remove("error-border"), 1000);
+            return;
         }
-        if(type==="traceroute") {
-            document.getElementById("traceroute-status").innerText="Checking...";
-            document.getElementById("traceroute-output").innerText="...";
+
+        if (type === "telnet" && (port === null || !isValidPort(port))) {
+            portInput.classList.add("error-border");
+            showValidationMessage("Port is required and must be between 1 and 65535.");
+            setTimeout(() => portInput.classList.remove("error-border"), 1000);
+            return;
         }
+
+        // UI elements
+        const elements = {
+            ping: {
+                display: document.getElementById("ping-target-display"),
+                status: document.getElementById("ping-status"),
+                output: document.getElementById("ping-output"),
+                placeholder: document.getElementById("ping-placeholder"),
+                btn: document.getElementById("btn-ping")
+            },
+            telnet: {
+                display: document.getElementById("telnet-target-display"),
+                status: document.getElementById("telnet-status"),
+                output: document.getElementById("telnet-output"),
+                placeholder: document.getElementById("telnet-placeholder"),
+                btn: document.getElementById("btn-telnet")
+            },
+            traceroute: {
+                display: document.getElementById("traceroute-target-display"),
+                status: document.getElementById("traceroute-status"),
+                output: document.getElementById("traceroute-output"),
+                placeholder: document.getElementById("traceroute-placeholder"),
+                btn: document.getElementById("btn-traceroute")
+            }
+        };
+
+        const current = elements[type];
+        
+        // Show target and loading state
+        current.display.innerText = (type === 'telnet' ? `${target}:${port}` : target);
+        current.status.innerText = "Checking...";
+        current.status.classList.remove("text-success", "text-danger");
+        
+        // Toggle view from placeholder to output box
+        current.placeholder.classList.add("d-none");
+        current.output.classList.remove("d-none");
+        current.output.innerText = "Waiting for terminal response...";
+        
+        // Disable button
+        const originalBtnText = current.btn.innerHTML;
+        current.btn.disabled = true;
+        current.btn.innerHTML = '<span class="material-symbols-rounded fa-spin">progress_activity</span> Running...';
 
         try {
             const res = await fetch("/api/remote_check", {
-                method:"POST",
-                headers:{"Content-Type":"application/json"},
-                body: JSON.stringify({target,type,port})
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ target, type, port })
             });
             const data = await res.json();
 
-            if(type==="ping") {
-                document.getElementById("ping-status").innerText = data.status;
-                document.getElementById("ping-output").innerText = data.message;
+            current.status.innerText = data.status || "Completed";
+            if (data.status === "success" || data.status === "online") {
+                current.status.classList.add("text-success");
+            } else {
+                current.status.classList.add("text-danger");
             }
-            if(type==="telnet") {
-                document.getElementById("telnet-status").innerText = data.status;
-                document.getElementById("telnet-output").innerText = data.message;
-            }
-            if(type==="traceroute") {
-                document.getElementById("traceroute-status").innerText = data.status;
-                document.getElementById("traceroute-output").innerText = data.message;
-            }
-
+            
+            // Format output string to be cleaner
+            current.output.innerText = data.message || "No console output returned.";
+            
         } catch(err) {
             console.error(err);
-            if(type==="ping") document.getElementById("ping-output").innerText = "Error: "+err;
-            if(type==="telnet") document.getElementById("telnet-output").innerText = "Error: "+err;
-            if(type==="traceroute") document.getElementById("traceroute-output").innerText = "Error: "+err;
+            current.status.innerText = "Failed";
+            current.status.classList.add("text-danger");
+            current.output.innerText = "Connection Error: Failed to reach server. Please check your network and try again.";
+        } finally {
+            current.btn.disabled = false;
+            current.btn.innerHTML = originalBtnText;
         }
     }
 
-    document.getElementById("btn-ping").addEventListener("click", ()=>remoteCheck("ping"));
-    document.getElementById("btn-telnet").addEventListener("click", ()=>remoteCheck("telnet"));
-    document.getElementById("btn-traceroute").addEventListener("click", ()=>remoteCheck("traceroute"));
+    document.getElementById("btn-ping").addEventListener("click", () => remoteCheck("ping"));
+    document.getElementById("btn-telnet").addEventListener("click", () => remoteCheck("telnet"));
+    document.getElementById("btn-traceroute").addEventListener("click", () => remoteCheck("traceroute"));
 });
 </script>
+
+<style>
+.error-border {
+    border-color: var(--danger) !important;
+    animation: shake 0.3s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+.text-success { color: #10B981 !important; }
+.text-danger { color: #EF4444 !important; }
+</style>
 {% endblock %}

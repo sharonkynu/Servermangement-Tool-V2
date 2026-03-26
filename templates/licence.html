@@ -77,6 +77,29 @@
     loadCurrentKeys();
   });
 
+  function maskSensitiveValue(value) {
+    const str = String(value || "").trim();
+    if (!str) return "Not Set";
+
+    // Keep the first 3 chars and the last up to 11 chars, mask the middle.
+    const prefixLen = 3;
+    const suffixLen = Math.min(11, Math.max(0, str.length - prefixLen));
+
+    if (str.length <= prefixLen + 7 + suffixLen) {
+      // Ensure there are always at least some masked characters for short-ish keys.
+      const prefix = str.slice(0, prefixLen);
+      const suffix = str.length > prefixLen ? str.slice(-suffixLen) : "";
+      const stars = "*".repeat(7);
+      return `${prefix}${stars}${suffix}`;
+    }
+
+    const prefix = str.slice(0, prefixLen);
+    const suffix = str.slice(-suffixLen);
+    const maskedCount = str.length - prefixLen - suffixLen;
+    const stars = "*".repeat(Math.max(7, maskedCount));
+    return `${prefix}${stars}${suffix}`;
+  }
+
   function showToast(message, type = "success") {
     const toast = document.getElementById("toast");
     toast.textContent = message;
@@ -88,10 +111,13 @@
     fetch("/api/licence_get")
       .then(res => res.json())
       .then(data => {
+        const managementKey = data.LICENCE_KEY_MANAGEMENT || "";
+        const mcuKey = data.LICENCE_KEY_MCU || "";
+
         document.getElementById("management-current").textContent =
-          data.LICENCE_KEY_MANAGEMENT || "Not Set";
+          maskSensitiveValue(managementKey);
         document.getElementById("mcu-current").textContent =
-          data.LICENCE_KEY_MCU || "Not Set";
+          maskSensitiveValue(mcuKey);
       })
       .catch(() => showToast("Failed to load current keys", "error"));
   }

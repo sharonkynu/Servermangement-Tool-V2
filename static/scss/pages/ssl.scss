@@ -1,0 +1,60 @@
+@import '../variables';
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.dashboard-card {
+    background: $bg-card;
+    padding: $spacing-xxl;
+    border-radius: $radius-xxl;
+    border: 1px solid $border-color;
+    box-shadow: $card-shadow;
+    animation: fadeInUp 0.5s ease-out;
+
+    .card-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: $spacing-xl;
+
+        h3 {
+            margin: 0;
+            font-size: $fs-18;
+            color: $text-main;
+        }
+    }
+
+    .drop-box {
+        border: 2px dashed $border-color;
+        border-radius: $radius-xl;
+        padding: 30px;
+        text-align: center;
+        cursor: pointer;
+        transition: $transition-mid;
+
+        &:hover {
+            border-color: $primary-btn;
+            background: rgba(0, 123, 255, 0.02);
+            .material-symbols-rounded { color: $primary-btn; }
+        }
+
+        .material-symbols-rounded {
+            font-size: $fs-32;
+            color: $text-muted;
+            transition: $transition-mid;
+        }
+
+        .status {
+            margin-top: $spacing-md;
+            color: $text-muted;
+            font-size: $fs-14;
+        }
+    }
+}
+
+.status {
+    &.mt-15 { margin-top: $spacing-lg !important; }
+}

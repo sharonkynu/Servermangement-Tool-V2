@@ -11,14 +11,14 @@
 <div class="network-grid">
     <!-- Network Status -->
     <div class="config-card">
-        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-            <div style="display: flex; align-items: center; gap: 15px;">
+        <div class="card-header card-header-flex">
+            <div class="card-header-gap">
                 <div class="card-icon">
                     <span class="material-symbols-rounded">lan</span>
                 </div>
                 <h3 style="margin: 0;">Network Status</h3>
             </div>
-            <span class="material-symbols-rounded" id="btn-refresh-network" style="cursor: pointer; color: var(--text-muted); font-size: 20px; transition: color 0.3s;" onmouseover="this.style.color='var(--text-main)'" onmouseout="this.style.color='var(--text-muted)'" title="Refresh Network Status">sync</span>
+            <span class="material-symbols-rounded pointer text-muted-color fs-20 pointer-hover" id="btn-refresh-network" title="Refresh Network Status">sync</span>
         </div>
         <div class="card-content">
             <div class="network-status-grid">
@@ -47,7 +47,7 @@
                 </div>
                 <h3 style="margin: 0;">Current DNS Status</h3>
             </div>
-            <span class="material-symbols-rounded" id="btn-refresh-dns" style="cursor: pointer; color: var(--text-muted); font-size: 20px; transition: color 0.3s;" onmouseover="this.style.color='var(--text-main)'" onmouseout="this.style.color='var(--text-muted)'" title="Refresh DNS Status">sync</span>
+            <span class="material-symbols-rounded pointer text-muted-color fs-20 pointer-hover" id="btn-refresh-dns" title="Refresh DNS Status">sync</span>
         </div>
         <div class="card-content">
             <div class="dns-status-grid">
@@ -80,9 +80,10 @@
         </div>
         <div class="card-content">
             <form id="network-config-form">
-                <div class="form-group" style="display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 15px; border-radius: 12px; background: rgba(0,0,0,0.02); border: 1px solid var(--border-color);">
+                <div class="form-group form-group-row">
                     <div>
-                        <label for="network-enable-toggle" style="margin-bottom: 5px; display: block; font-weight: 600;">Enable Network Interface</label>
+                        <label for="network-enable-toggle" class="mb-5 d-block fw-600">
+Enable Network Interface</label>
                         <span style="font-size: 13px; color: var(--text-muted);">Turn on to enable connectivity</span>
                     </div>
                     <label class="toggle-switch">
@@ -91,7 +92,7 @@
                     </label>
                 </div>
 
-                <div id="dhcp-toggle-container" class="form-group" style="display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 15px; border-radius: 12px; background: rgba(0,0,0,0.02); border: 1px solid var(--border-color);">
+                <div id="dhcp-toggle-container" class="form-group form-group-row">
                     <div>
                         <label for="network-dhcp-toggle" style="margin-bottom: 5px; display: block; font-weight: 600;">Automatic via DHCP</label>
                         <span style="font-size: 13px; color: var(--text-muted);">Automatically assign IP address</span>
@@ -102,14 +103,21 @@
                     </label>
                 </div>
 
-                <div id="net-content-disable" style="display:none; margin-bottom: 20px;">
-                    <div style="background: rgba(234, 153, 102, 0.1); border-left: 4px solid #f6ad55; padding: 15px; border-radius: 4px;">
-                        <span class="material-symbols-rounded" style="vertical-align: middle; margin-right: 8px; color: #f6ad55;">warning</span>
+                <div id="net-content-disable" class="d-none mb-20">
+                    <div class="warning-banner">
+                        <span class="material-symbols-rounded warning-icon">warning</span>
                         <span style="color: var(--text-main);">Network interface will be disabled. Connectivity may be lost!</span>
                     </div>
                 </div>
 
-                <div id="net-content-manual" style="display:none;">
+                <div id="net-content-manual" class="d-none">
+                    <div class="mode-helper-box mb-15">
+                        <div class="mode-helper-header">
+                            <span class="material-symbols-rounded">build_circle</span>
+                            <span>Manual Network Settings</span>
+                        </div>
+                        <p>Enter a static IP address, subnet mask, and gateway for this interface.</p>
+                    </div>
                     <div class="form-group">
                         <label for="ip-address">IP Address</label>
                         <input type="text" id="ip-address" name="ip_address" class="form-control" placeholder="192.168.1.100">
@@ -146,10 +154,10 @@
         </div>
         <div class="card-content">
             <form id="dns-config-form">
-                <div class="form-group" style="display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 15px; border-radius: 12px; background: rgba(0,0,0,0.02); border: 1px solid var(--border-color);">
+                <div class="form-group form-group-row">
                     <div>
-                        <label for="dns-enable-toggle" style="margin-bottom: 5px; display: block; font-weight: 600;">Enable DNS Resolution</label>
-                        <span style="font-size: 13px; color: var(--text-muted);">Turn on to resolve hostnames</span>
+                        <label for="dns-enable-toggle" class="mb-5 d-block fw-600">Enable DNS Resolution</label>
+                        <span class="fs-13 text-muted-color">Turn on to resolve hostnames</span>
                     </div>
                     <label class="toggle-switch">
                         <input type="checkbox" id="dns-enable-toggle" checked>
@@ -157,10 +165,10 @@
                     </label>
                 </div>
 
-                <div id="dns-dhcp-toggle-container" class="form-group" style="display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 15px; border-radius: 12px; background: rgba(0,0,0,0.02); border: 1px solid var(--border-color);">
+                <div id="dns-dhcp-toggle-container" class="form-group form-group-row">
                     <div>
-                        <label for="dns-dhcp-toggle" style="margin-bottom: 5px; display: block; font-weight: 600;">Automatic via DHCP</label>
-                        <span style="font-size: 13px; color: var(--text-muted);">Automatically fetch DNS settings</span>
+                        <label for="dns-dhcp-toggle" class="mb-5 d-block fw-600">Automatic via DHCP</label>
+                        <span class="fs-13 text-muted-color">Automatically fetch DNS settings</span>
                     </div>
                     <label class="toggle-switch">
                         <input type="checkbox" id="dns-dhcp-toggle">
@@ -168,14 +176,21 @@
                     </label>
                 </div>
 
-                <div id="dns-content-disable" style="display:none; margin-bottom: 20px;">
-                    <div style="background: rgba(234, 153, 102, 0.1); border-left: 4px solid #f6ad55; padding: 15px; border-radius: 4px;">
-                        <span class="material-symbols-rounded" style="vertical-align: middle; margin-right: 8px; color: #f6ad55;">warning</span>
-                        <span style="color: var(--text-main);">DNS resolution will be disabled. Hostnames will not resolve.</span>
+                <div id="dns-content-disable" class="d-none mb-20">
+                    <div class="warning-banner">
+                        <span class="material-symbols-rounded warning-icon">warning</span>
+                        <span class="text-main-color">DNS resolution will be disabled. Hostnames will not resolve.</span>
                     </div>
                 </div>
 
-                <div id="dns-content-manual" style="display:none;">
+                <div id="dns-content-manual" class="d-none">
+                    <div class="mode-helper-box mb-15">
+                        <div class="mode-helper-header">
+                            <span class="material-symbols-rounded">edit_square</span>
+                            <span>Manual Mode Configuration</span>
+                        </div>
+                        <p>Fill these fields only when DNS mode is set to Manual.</p>
+                    </div>
                     <div class="form-group">
                         <label for="dns-hostname">Host name</label>
                         <input type="text" id="dns-hostname" name="dns_hostname" class="form-control" placeholder="server.local">
@@ -194,13 +209,13 @@
                     </div>
                 </div>
 
-                <div class="form-group readonly" id="dns-status-row" style="display:none;">
+                <div class="form-group readonly d-none" id="dns-status-row">
                     <label>DNS Status</label>
                     <div id="dns-status">-</div>
                 </div>
 
                 <div class="form-actions">
-                    <button type="submit" class="btn btn-primary btn-Apply" display="inline-block">
+                    <button type="submit" class="btn btn-primary btn-Apply display-inline-block">
                         <span class="material-symbols-rounded">save</span> Apply DNS Config
                     </button>
                     <button type="button" class="btn btn-secondary" id="reset-dns">
@@ -305,17 +320,26 @@ document.addEventListener('DOMContentLoaded', () => {
     const disableContent = document.getElementById('net-content-disable');
 
     function syncNetworkToggles() {
+        const modePill = document.getElementById('network-mode-pill');
+        const modeHelpText = document.getElementById('network-mode-help-text');
+
         if (!enableToggle.checked) {
-            if(dhcpContainer) dhcpContainer.style.display = 'none';
-            if(manualContent) manualContent.style.display = 'none';
-            if(disableContent) disableContent.style.display = 'block';
+            if(dhcpContainer) dhcpContainer.classList.add('d-none');
+            if(manualContent) manualContent.classList.add('d-none');
+            if(disableContent) disableContent.classList.remove('d-none');
+            if (modePill) modePill.textContent = 'Disabled';
+            if (modeHelpText) modeHelpText.textContent = 'Interface is disabled. Network connectivity is turned off.';
         } else {
-            if(dhcpContainer) dhcpContainer.style.display = 'flex';
-            if(disableContent) disableContent.style.display = 'none';
+            if(dhcpContainer) { dhcpContainer.classList.remove('d-none'); dhcpContainer.classList.add('d-flex'); }
+            if(disableContent) disableContent.classList.add('d-none');
             if (dhcpToggle.checked) {
-                if(manualContent) manualContent.style.display = 'none';
+                if(manualContent) manualContent.classList.add('d-none');
+                if (modePill) modePill.textContent = 'DHCP';
+                if (modeHelpText) modeHelpText.textContent = 'DHCP mode is active. IP settings are assigned automatically.';
             } else {
-                if(manualContent) manualContent.style.display = 'block';
+                if(manualContent) manualContent.classList.remove('d-none');
+                if (modePill) modePill.textContent = 'Manual';
+                if (modeHelpText) modeHelpText.textContent = 'Manual mode is active. Provide IP address, subnet mask, and gateway below.';
             }
         }
     }
@@ -375,16 +399,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function syncDnsToggles() {
         if (!dnsEnableToggle.checked) {
-            if(dnsDhcpContainer) dnsDhcpContainer.style.display = 'none';
-            if(dnsManualContent) dnsManualContent.style.display = 'none';
-            if(dnsDisableContent) dnsDisableContent.style.display = 'block';
+            if(dnsDhcpContainer) dnsDhcpContainer.classList.add('d-none');
+            if(dnsManualContent) dnsManualContent.classList.add('d-none');
+            if(dnsDisableContent) dnsDisableContent.classList.remove('d-none');
         } else {
-            if(dnsDhcpContainer) dnsDhcpContainer.style.display = 'flex';
-            if(dnsDisableContent) dnsDisableContent.style.display = 'none';
+            if(dnsDhcpContainer) { dnsDhcpContainer.classList.remove('d-none'); dnsDhcpContainer.classList.add('d-flex'); }
+            if(dnsDisableContent) dnsDisableContent.classList.add('d-none');
             if (dnsDhcpToggle.checked) {
-                if(dnsManualContent) dnsManualContent.style.display = 'none';
+                if(dnsManualContent) dnsManualContent.classList.add('d-none');
             } else {
-                if(dnsManualContent) dnsManualContent.style.display = 'block';
+                if(dnsManualContent) dnsManualContent.classList.remove('d-none');
             }
         }
     }
@@ -517,152 +541,4 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
-<style>
-.config-card {
-    background: var(--bg-card);
-    border-radius: 16px;
-    
-    padding: 20px;
-    margin-bottom: 25px; /* spacing between cards */
-    border: 1px solid var(--border-color);
-}
-.network-status-grid {
-    display: grid;
-    gap: 10px;
-    margin-top: 10px;
-}
-.status-row {
-    display: flex;
-    justify-content: space-between;
-    border-bottom: 1px solid var(--border-color);
-    padding: 6px 0;
-}
-.status-label {
-    font-weight: 600;
-    color: var(--text-muted);
-}
-.status-value {
-    font-family: monospace;
-    color: var(--text-main);
-}
-.route-row {
-    display: grid;
-    grid-template-columns: 1.5fr 1.5fr 0.5fr auto;
-    gap: 10px;
-    align-items: center;
-    margin-top: 10px;
-}
-.route-row .form-control {
-    padding: 6px 10px;
-    border-radius: 6px;
-    border: 1px solid var(--border-color);
-    background: var(--input-bg);
-    color: var(--input-text);
-}
-.notification {
-    position: fixed;
-    top: 20px;
-    right: -400px;
-    background: var(--bg-card);
-    color: var(--text-main);
-    padding: 10px 15px;
-    border-radius: 6px;
-    z-index: 9999;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    transition: right 0.3s ease;
-    border: 1px solid var(--border-color);
-}
-.notification-show { right: 20px; }
-.notification-success { background: #28a745; color: #fff; }
-.notification-error { background: var(--danger); color: #fff; }
-
-
-.btn-Apply {
-    color: #fff;
-}
-
-/* UI/UX Segmented Controls */
-.segmented-control {
-    display: flex;
-    background: var(--input-bg, #f3f4f6);
-    border: 1px solid var(--border-color, #e5e7eb);
-    border-radius: 50px;
-    padding: 6px;
-    gap: 6px;
-    width: fit-content;
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
-}
-
-.segmented-control input[type="radio"] {
-    display: none;
-}
-
-.segmented-control .segment-label {
-    padding: 10px 24px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-    color: #fff;
-    transition: all 0.3s ease;
-    margin: 0;
-    user-select: none;
-    border-radius: 50px;
-}
-
-.segmented-control input[type="radio"]:checked + .segment-label {
-    background: var(--primary-btn);
-    color: white !important;
-}
-
-/* Toggle Switch UI */
-.toggle-switch {
-  position: relative;
-  display: inline-block;
-  width: 50px;
-  height: 28px;
-}
-
-.toggle-switch input { 
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.toggle-slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background-color: var(--border-color, #ccc);
-  transition: .4s;
-  border-radius: 34px;
-}
-
-.toggle-slider:before {
-  position: absolute;
-  content: "";
-  height: 20px;
-  width: 20px;
-  left: 4px;
-  bottom: 4px;
-  background-color: white;
-  transition: .4s;
-  border-radius: 50%;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-}
-
-.toggle-switch input:checked + .toggle-slider {
-  background: var(--primary-btn, linear-gradient(135deg, #667eea, #764ba2));
-}
-
-.toggle-switch input:focus + .toggle-slider {
-  box-shadow: 0 0 1px var(--primary-btn, #667eea);
-}
-
-.toggle-switch input:checked + .toggle-slider:before {
-  transform: translateX(22px);
-}
-</style>
 {% endblock %}

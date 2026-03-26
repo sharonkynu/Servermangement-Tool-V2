@@ -1,0 +1,191 @@
+@import '../variables';
+
+.page-header {
+    text-align: center;
+    margin-bottom: $spacing-xxl;
+}
+
+.ports-grid {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $spacing-xxl;
+}
+
+.config-card {
+    background: $bg-card;
+    border-radius: $radius-xxl;
+    box-shadow: $card-shadow;
+    width: 90%;
+    max-width: 800px;
+    padding: $spacing-xxl;
+    animation: fadeInUp 0.5s ease-out;
+    margin-bottom: $spacing-xxl;
+    border: 1px solid $border-color;
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    margin-bottom: $spacing-xl;
+
+    h3 {
+        font-size: $fs-headline;
+        margin: 0;
+        color: $text-main;
+    }
+
+    .card-icon i {
+        background: $primary-btn;
+        color: white;
+        padding: 10px;
+        border-radius: $radius-lg;
+    }
+}
+
+.protocol-section {
+    border: 1px solid $border-color;
+    border-radius: $radius-xl;
+    padding: $spacing-lg;
+    margin-bottom: $spacing-lg;
+    background: $bg-main;
+    transition: all $transition-mid;
+}
+
+.protocol-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.protocol-info {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+}
+
+.protocol-details {
+    h4 {
+        margin: 0;
+        font-weight: 600;
+        color: $text-main;
+    }
+    p {
+        margin: 0;
+        font-size: 0.9em;
+        color: $text-muted;
+    }
+}
+
+.config-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin-top: $spacing-lg;
+    width: 100%;
+}
+
+.form-group {
+    width: 100%;
+
+    label {
+        display: block;
+        font-weight: 500;
+        margin-bottom: $spacing-xs;
+        color: $text-main;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+}
+
+.form-actions {
+    text-align: center;
+    margin-top: $spacing-xxl;
+    display: flex;
+    justify-content: center;
+    gap: $spacing-lg;
+}
+
+.ports-table {
+    background: $bg-main;
+    border-radius: $radius-md;
+    padding: $spacing-lg;
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.port-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: $bg-card;
+    border: 1px solid $border-color;
+    border-radius: $radius-sm;
+    padding: 12px;
+    margin-bottom: 8px;
+    transition: all $transition-mid;
+
+    &:hover {
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+}
+
+.port-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+}
+
+.port-name {
+    font-weight: 600;
+    color: $text-main;
+}
+
+.port-number {
+    background: rgba(0, 123, 255, 0.1);
+    color: $primary-btn;
+    padding: 4px 8px;
+    border-radius: $radius-pill;
+    font-size: 0.9em;
+    font-weight: 600;
+    min-width: 45px;
+    text-align: center;
+}
+
+.port-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    &-indicator {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: $danger;
+
+        &.enabled { background: #28a745; }
+    }
+}
+
+.scan-output {
+    background: #111;
+    color: #0f0;
+    font-family: monospace;
+    border-radius: $radius-md;
+    padding: 12px;
+    height: 300px;
+    overflow-y: auto;
+    font-size: 0.9em;
+}
+
+.scan-summary {
+    background: $primary-btn;
+    color: white;
+    padding: 4px 8px;
+    border-radius: $radius-xs;
+    font-size: 0.9em;
+    font-weight: 600;
+}

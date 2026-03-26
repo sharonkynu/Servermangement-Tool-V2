@@ -1,0 +1,180 @@
+@import '../variables';
+
+
+.page-head-container{
+    display: flex;
+    justify-content: flex-start;
+    align-items: stretch;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 16px;
+    .system-toolbar {
+        align-self: flex-end;
+        width: fit-content;
+        padding: 8px 12px;
+        border: 1px solid rgba($primary-btn, 0.18);
+        border-radius: $radius-lg;
+        background: rgba($primary-btn, 0.1);
+        margin: 0;
+    }
+  
+}
+
+.system-toolbar-right {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 8px;
+    border: 1px solid rgba($primary-btn, 0.2);
+    border-radius: $radius-pill;
+    background: rgba($primary-btn, 0.16);
+
+    .refresh-clock-icon {
+        width: 22px;
+        height: 22px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        font-size: 14px;
+        color: $primary-btn;
+        background: rgba($primary-btn, 0.14);
+        border: 1px solid rgba($primary-btn, 0.25);
+    }
+
+    label {
+        color: $text-main;
+        font-size: $fs-12;
+        font-weight: 700;
+        letter-spacing: 0.2px;
+    }
+
+    select {
+        min-width: 74px;
+        border: 1px solid rgba($primary-btn, 0.25);
+        border-radius: $radius-md;
+        padding: 6px 8px;
+        background: $bg-main;
+        color: $text-main;
+        font-size: $fs-12;
+        outline: none;
+        font-weight: 600;
+
+        &:focus {
+            border-color: $primary-btn;
+        }
+    }
+}
+
+.next-refresh-label {
+    min-width: 40px;
+    text-align: center;
+    padding: 5px 8px;
+    border: 1px solid rgba($primary-btn, 0.24);
+    border-radius: $radius-pill;
+    background: rgba($primary-btn, 0.1);
+    font-size: $fs-12;
+    color: $primary-btn;
+    font-weight: 700;
+}
+
+.system-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 16px;
+}
+
+.system-grid .info-card {
+    border: 1px solid $border-color;
+    border-radius: $radius-xl;
+    background: $bg-card;
+    overflow: hidden;
+}
+
+.system-grid .card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px;
+    border-bottom: 1px solid $border-color;
+
+    h3 {
+        margin: 0;
+        font-size: $fs-16;
+        color: $text-main;
+        font-weight: 700;
+    }
+
+    .card-icon {
+        width: 34px;
+        height: 34px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: $radius-md;
+        background: rgba($primary-btn, 0.12);
+        color: $primary-btn;
+    }
+}
+
+.system-grid .card-content {
+    padding: 16px;
+}
+
+.refresh-indicator {
+    margin-left: auto;
+}
+
+.refresh-indicator .material-symbols-rounded {
+    cursor: pointer;
+    color: $text-muted;
+    font-size: 20px;
+}
+
+.progress-container {
+    width: 100%;
+    margin-bottom: $spacing-md;
+
+    .progress-bar {
+        background: $border-color;
+        height: 10px;
+        border-radius: $radius-pill;
+        overflow: hidden;
+    }
+}
+
+.progress-fill {
+    height: 100%;
+    background: $primary-btn;
+    border-radius: $radius-pill;
+    transition: width $transition-slow;
+    width: var(--progress, 0%) !important;
+}
+
+.system-details {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.detail-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid $border-color;
+
+    &:last-child {
+        border-bottom: none;
+    }
+
+    .detail-label {
+        font-weight: 500;
+        color: $text-muted;
+    }
+
+    .detail-value {
+        color: $text-main;
+        font-weight: 700;
+    }
+}

@@ -1,0 +1,104 @@
+@import '../variables';
+
+.dns-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 25px;
+    margin-bottom: 30px;
+    width: 100%;
+}
+
+.dns-servers-list {
+    margin-bottom: $spacing-md;
+
+    .dns-server-item {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 8px;
+        
+        .remove-server {
+            background: rgba($danger, 0.1);
+            color: $danger;
+            border: none;
+            border-radius: $radius-sm;
+            padding: 4px;
+            cursor: pointer;
+            @extend .d-flex;
+            align-items: center;
+            justify-content: center;
+            &:hover { background: $danger; color: white; }
+        }
+    }
+}
+
+.add-dns-server {
+    background: rgba($primary-btn, 0.1);
+    color: $primary-btn;
+    border: 1px dashed $primary-btn;
+    padding: $spacing-xs $spacing-lg;
+    border-radius: $radius-md;
+    cursor: pointer;
+    font-weight: 600;
+    @extend .d-flex;
+    align-items: center;
+    gap: 6px;
+    &:hover { background: rgba($primary-btn, 0.2); }
+}
+
+.dns-status-grid {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-lg;
+    
+    .status-item {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 10px;
+        border-bottom: 1px solid $border-color;
+        &:last-child { border-bottom: none; }
+        
+        .status-icon {
+            color: $primary-btn;
+            background: rgba($primary-btn, 0.1);
+            padding: 8px;
+            border-radius: $radius-md;
+        }
+        
+        .status-info {
+            display: flex;
+            flex-direction: column;
+            .status-label { font-size: $fs-13; color: $text-muted; }
+            .status-value { font-weight: 600; color: $text-main; }
+        }
+    }
+}
+
+.lookup-tools {
+    .tool-group { margin-bottom: $spacing-xl; }
+    .lookup-input {
+        display: flex;
+        gap: 10px;
+        input { flex: 1; }
+        .lookup-btn { @extend .btn; @extend .btn-primary; }
+    }
+}
+
+.tool-output {
+    background: #1a1a1a;
+    color: #00ff00;
+    border-radius: $radius-md;
+    margin-top: $spacing-xl;
+    padding: 15px;
+    font-family: monospace;
+    font-size: $fs-14;
+    
+    .output-header { 
+        display: flex; 
+        justify-content: space-between; 
+        margin-bottom: 10px; 
+        color: white; 
+        border-bottom: 1px solid #333; 
+        padding-bottom: 5px; 
+    }
+}

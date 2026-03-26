@@ -1,0 +1,93 @@
+@import '../variables';
+
+.licence-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+.licence-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.status-strip {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 15px;
+    background: rgba($primary-btn, 0.05);
+    border-radius: $radius-lg;
+    border: 1px solid rgba($primary-btn, 0.1);
+    
+    .status-strip-icon { color: $primary-btn; }
+    .status-label { font-weight: 600; color: $text-muted; }
+    .status-badge { 
+        font-family: monospace; 
+        color: $text-main; 
+        font-weight: 700; 
+        margin-left: auto; 
+    }
+}
+
+.licence-input-wrapper {
+    display: flex;
+    gap: 10px;
+    input { flex: 1; min-width: 0; }
+    button { @extend .btn; @extend .btn-primary; padding: 12px 20px; }
+}
+
+.licence-actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+    
+    .btn-restart-stack {
+        @extend .btn;
+        @extend .btn-secondary; // Change to secondary or success if appropriate
+        width: 100%;
+        background: #f1f5f9;
+        color: var(--danger);
+        border: 1px solid var(--danger);
+        &:hover { background: var(--danger); color: white; }
+    }
+}
+
+.toast {
+    position: fixed;
+    bottom: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1a1a1a;
+    color: white;
+    padding: 12px 25px;
+    border-radius: $radius-pill;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+    opacity: 0;
+    transition: all $transition-mid;
+    z-index: 3000;
+    
+    &.show { bottom: 30px; opacity: 1; }
+    &.error { background: $danger; }
+}
+
+/* Ensure toast is not stretched by conflicting legacy `.toast` rules */
+#toast.toast {
+    /* Legacy styles set `top` too; we must unset it so height doesn't stretch. */
+    top: auto !important;
+    right: auto !important;
+    left: 50% !important;
+    bottom: -100px !important;
+    width: fit-content !important;
+    max-width: 420px !important;
+    height: auto !important;
+    transform: translateX(-50%) translateY(-20px) !important;
+}
+
+#toast.toast.show {
+    bottom: 30px !important;
+    opacity: 1 !important;
+    transform: translateX(-50%) translateY(0) !important;
+}
