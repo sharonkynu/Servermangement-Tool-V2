@@ -3335,9 +3335,16 @@ input:checked + .slider:before {
 .card { background: #ffffff; border-radius: 16px; padding: 30px 25px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); width: 450px; text-align: center; }
 .card h2 { margin-bottom: 20px; color: #7e22ce; }
 
-.drop-box { border: 2px dashed #a855f7; padding: 40px; border-radius: 12px; cursor: pointer; background: #f8f7ff; transition: 0.3s; }
-.drop-box:hover { background: #e9e6ff; }
-.drop-box p { margin: 0; color: #6b21a8; font-size: 1em; }
+.drop-box { 
+    border: 2px dashed var(--primary-btn); 
+    padding: 40px; 
+    border-radius: 12px; 
+    cursor: pointer; 
+    background: var(--bg-main); 
+    transition: 0.3s; 
+}
+.drop-box:hover { background: var(--sidebar-hover); }
+.drop-box p { margin: 0; color: var(--text-main); font-size: 1em; }
 
 .card-actions { display: flex; justify-content: center; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
 .btn { padding: 12px 25px; border: none; border-radius: 10px; cursor: pointer; font-size: 1em; transition: 0.3s; font-weight: 600; }

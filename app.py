@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session, Response, stream_with_context
 import json
 import os
 import subprocess
@@ -913,6 +913,53 @@ def remote_check_page():
         return redirect(url_for('login'))
     
     return render_template('remote_check.html')
+
+@app.route('/api/remote_check_stream', methods=['POST'])
+def api_remote_check_stream():
+    if 'user' not in session:
+        return jsonify({'error': 'Not authenticated'}), 401
+    
+    data = request.json
+    target = data.get('target')
+    check_type = data.get('type')  # ping, telnet, traceroute
+    port = data.get('port', 80)
+    
+    def generate():
+        try:
+            if check_type == 'ping':
+                cmd = ['ping', '-c', '4', target]
+            elif check_type == 'telnet':
+                # Use timeout to prevent telnet from hanging if it connects successfully
+                cmd = ['timeout', '5s', 'telnet', target, str(port)]
+            elif check_type == 'traceroute':
+                cmd = ['traceroute', '-w', '2', '-m', '20', target]
+            else:
+                yield "Invalid check type"
+                return
+
+            process = subprocess.Popen(
+                cmd,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+                bufsize=1,
+                universal_newlines=True
+            )
+
+            for line in process.stdout:
+                yield line
+            
+            process.wait()
+            
+            if check_type == 'telnet' and process.returncode == 124:
+                yield "\nTelnet session timed out (this usually means connection was successful but no data was sent)."
+            elif process.returncode != 0 and check_type != 'traceroute':
+                yield f"\nCommand exited with code {process.returncode}"
+
+        except Exception as e:
+            yield f"Error: {str(e)}"
+
+    return Response(stream_with_context(generate()), mimetype='text/plain')
 
 @app.route('/api/remote_check', methods=['POST'])
 def api_remote_check():
